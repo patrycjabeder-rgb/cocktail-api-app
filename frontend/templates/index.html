@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sip&Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:        #FAF7F2;
+  --surface:   #F3EDE3;
+  --card:      #FFFFFF;
+  --border:    #E4DDD2;
+  --terracotta:#C8715A;
+  --terra-lt:  #E8927A;
+  --terra-dim: rgba(200,113,90,0.10);
+  --sage:      #7A9E78;
+  --sage-dim:  rgba(122,158,120,0.12);
+  --text:      #2C2420;
+  --muted:     #9E9085;
+  --danger:    #C0392B;
+  --success:   #3A8C5C;
+  --radius:    8px;
+  --shadow:    0 1px 4px rgba(44,36,32,0.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-weight:300;
+  min-height:100vh;font-size:14px;line-height:1.6;
+}
+/* ── Layout ── */
+#app{display:flex;min-height:100vh}
+nav{
+  width:210px;flex-shrink:0;
+  background:var(--card);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:28px 0;
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+  box-shadow:var(--shadow);
+}
+.logo{
+  font-family:'Fraunces',serif;font-size:22px;
+  color:var(--terracotta);padding:0 22px 24px;
+  letter-spacing:-0.3px;border-bottom:1px solid var(--border);margin-bottom:16px;
+}
+.logo em{font-style:italic;color:var(--terra-lt)}
+nav a{
+  display:flex;align-items:center;gap:10px;padding:9px 22px;
+  color:var(--muted);text-decoration:none;font-size:13px;font-weight:400;
+  border-left:2px solid transparent;transition:color .15s,border-color .15s,background .15s;
+  cursor:pointer;
+}
+nav a:hover{color:var(--text);background:var(--surface)}
+nav a.active{color:var(--terracotta);border-left-color:var(--terracotta);background:var(--terra-dim)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.nav-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:14px}
+main{margin-left:210px;flex:1;padding:40px 52px;max-width:880px}
+
+/* ── Pages ── */
+.page{display:none}.page.active{display:block}
+.page-title{font-family:'Fraunces',serif;font-size:30px;font-weight:600;color:var(--text);margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:13px;margin-bottom:30px}
+
+/* ── Forms ── */
+.form-group{margin-bottom:15px}
+label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:500}
+input,select,textarea{
+  width:100%;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--radius);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;
+  padding:9px 13px;outline:none;transition:border-color .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--terracotta);background:#fff}
+textarea{resize:vertical;min-height:80px}
+select option{background:#fff}
+
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 20px;border-radius:var(--radius);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;transition:opacity .15s,transform .1s;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--terracotta);color:#fff}
+.btn-primary:hover{opacity:.87}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-danger{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* ── Cards ── */
+.card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.card-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:4px}
+.card-meta{color:var(--muted);font-size:12px;margin-bottom:10px}
+.card-body{color:var(--text);line-height:1.7}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;
+  background:var(--terra-dim);color:var(--terracotta);letter-spacing:.3px
+}
+.badge-sage{background:var(--sage-dim);color:var(--sage)}
+.badge-muted{background:var(--surface);color:var(--muted)}
+.alert{padding:10px 16px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;border-left:3px solid}
+.alert-error{background:rgba(192,57,43,.07);border-color:var(--danger);color:#a33}
+.alert-success{background:rgba(58,140,92,.07);border-color:var(--success);color:var(--success)}
+.divider{border:none;border-top:1px solid var(--border);margin:22px 0}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1.5px solid var(--border);margin-bottom:24px}
+.tab{
+  padding:9px 18px;font-size:13px;cursor:pointer;color:var(--muted);
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+  background:none;border-top:none;border-left:none;border-right:none;
+  font-family:'DM Sans',sans-serif;margin-bottom:-1.5px;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--terracotta);border-bottom-color:var(--terracotta)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── Loader ── */
+.loader{display:none;align-items:center;gap:8px;color:var(--muted);font-size:13px;padding:14px 0}
+.loader.active{display:flex}
+.spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--terracotta);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Home hero ── */
+.hero{padding:48px 0 36px;border-bottom:1.5px solid var(--border);margin-bottom:40px}
+.hero-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:var(--terracotta);margin-bottom:12px;font-weight:500}
+.hero-title{font-family:'Fraunces',serif;font-size:46px;line-height:1.1;font-weight:600;margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--terracotta)}
+.hero-body{color:var(--muted);max-width:460px;line-height:1.9;font-size:14px}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.feature-tile{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:20px;cursor:pointer;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)
+}
+.feature-tile:hover{border-color:var(--terracotta);box-shadow:0 3px 12px rgba(200,113,90,.12)}
+.feature-tile .icon{font-size:22px;margin-bottom:10px}
+.feature-tile .name{font-size:13px;font-weight:500;margin-bottom:3px;color:var(--text)}
+.feature-tile .desc{font-size:12px;color:var(--muted)}
+
+/* ── Search ── */
+.row{display:flex;gap:10px;align-items:flex-end}
+.row .form-group{flex:1;margin-bottom:0}
+.tag-input-wrap{display:flex;gap:8px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{
+  display:flex;align-items:center;gap:5px;
+  background:var(--terra-dim);color:var(--terracotta);
+  border-radius:100px;padding:3px 11px;font-size:12px
+}
+.tag button{background:none;border:none;color:inherit;cursor:pointer;font-size:14px;line-height:1;padding:0}
+.mood-pills{display:flex;flex-wrap:wrap;gap:8px}
+.mood-pill{
+  padding:6px 16px;border-radius:100px;font-size:13px;
+  border:1.5px solid var(--border);background:none;color:var(--muted);
+  cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif
+}
+.mood-pill:hover,.mood-pill.selected{background:var(--terra-dim);border-color:var(--terracotta);color:var(--terracotta)}
+
+/* ── Autocomplete dropdown ── */
+.ac-wrap{position:relative;flex:1}
+.ac-dropdown{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 4px 20px rgba(44,36,32,0.10);overflow:hidden;
+  max-height:260px;overflow-y:auto;
+}
+.ac-dropdown.open{display:block}
+.ac-item{
+  padding:9px 14px;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);transition:background .1s;
+  color:var(--text);
+}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.focused{background:var(--surface)}
+.ac-item-name{font-weight:400}
+.ac-item-cat{font-size:11px;color:var(--muted)}
+.ac-empty{padding:10px 14px;font-size:13px;color:var(--muted);font-style:italic}
+
+/* ── Save button ── */
+.save-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:1.5px solid var(--border);border-radius:100px;
+  padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .15s;
+}
+.save-btn:hover{border-color:var(--terracotta);color:var(--terracotta)}
+.save-btn.saved{background:var(--terra-dim);border-color:var(--terracotta);color:var(--terracotta)}
+.save-btn .heart{font-size:14px;line-height:1;transition:transform .2s}
+.save-btn.saved .heart{transform:scale(1.25)}
+@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.5)}100%{transform:scale(1.25)}}
+.save-btn.just-saved .heart{animation:heartPop .3s ease}
+
+/* ── Ingredient AC ── */
+.ing-ac-wrap{position:relative;flex:1}
+.ing-ac-dropdown{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 4px 20px rgba(44,36,32,0.10);overflow:hidden;max-height:220px;overflow-y:auto;
+}
+.ing-ac-dropdown.open{display:block}
+
+/* ── Custom cocktail builder ── */
+.custom-page-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:28px;padding-bottom:22px;border-bottom:1.5px solid var(--border);
+}
+.custom-page-icon{
+  font-size:36px;width:56px;height:56px;border-radius:12px;
+  background:var(--terra-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ing-row{
+  display:grid;grid-template-columns:1fr 160px 32px;gap:10px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.ing-row:last-child{border-bottom:none}
+.ing-row-name{font-size:14px;font-weight:400;color:var(--text)}
+.ing-row input{margin:0}
+.ing-remove{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:18px;line-height:1;padding:4px;border-radius:4px;transition:color .1s;
+}
+.ing-remove:hover{color:var(--danger)}
+.add-ing-row{
+  display:flex;gap:8px;margin-top:14px;align-items:center;
+  padding-top:14px;border-top:1.5px dashed var(--border);
+}
+.custom-preview{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;
+  font-size:13px;color:var(--muted);line-height:1.7;
+}
+.custom-preview strong{color:var(--text);font-weight:500}
+
+/* ── Saved page ── */
+.saved-empty{text-align:center;padding:60px 0;color:var(--muted)}
+.saved-empty .icon{font-size:40px;margin-bottom:12px}
+.saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.saved-tile{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:6px;
+}
+.saved-tile:hover{border-color:var(--terracotta);box-shadow:0 3px 12px rgba(200,113,90,.1)}
+.saved-tile-name{font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:var(--text)}
+.saved-tile-meta{font-size:11px;color:var(--muted)}
+.saved-tile-actions{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+
+.post-card .post-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.post-card .post-user{font-weight:500;font-size:13px}
+.post-card .post-time{color:var(--muted);font-size:11px}
+.post-card .post-cocktail{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--terracotta);margin-bottom:4px}
+.post-card .post-caption{color:var(--muted);font-size:13px}
+.post-card .stars{color:var(--terracotta);letter-spacing:2px;font-size:13px;margin-bottom:5px}
+.post-card img{width:100%;border-radius:6px;margin-top:10px;max-height:220px;object-fit:cover}
+.stars-input{display:flex;gap:5px}
+.stars-input button{background:none;border:none;font-size:22px;cursor:pointer;color:var(--border);transition:color .1s}
+.stars-input button.on{color:var(--terracotta)}
+
+/* ── Bar ── */
+.bar-card{display:flex;justify-content:space-between;align-items:flex-start}
+.bar-info .bar-name{font-weight:500;font-size:15px;margin-bottom:3px}
+.bar-info .bar-addr{color:var(--muted);font-size:12px}
+.bar-stat{text-align:right;flex-shrink:0}
+.bar-stat .rating{font-size:22px;font-family:'Fraunces',serif;font-weight:600;color:var(--terracotta)}
+.bar-stat .reviews{font-size:11px;color:var(--muted)}
+
+/* ── Trending ── */
+.trend-row{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid var(--border)}
+.trend-rank{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--border);width:32px;text-align:center}
+.trend-name{font-size:14px;flex:1}
+.trend-count{color:var(--muted);font-size:12px}
+
+/* ── User status ── */
+#user-status{
+  padding:8px 18px;background:var(--terra-dim);border-radius:var(--radius);
+  margin:0 14px 16px;font-size:12px;color:var(--terracotta);display:none;font-weight:500
+}
+#user-status.visible{display:block}
+
+/* ── Empty ── */
+.empty{text-align:center;padding:48px 0;color:var(--muted)}
+.empty .icon{font-size:32px;margin-bottom:10px}
+
+/* ════════════════════════════════════════
+   COCKTAIL CREATOR — THE GLASS
+════════════════════════════════════════ */
+.creator-layout{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
+.creator-controls{}
+
+/* The glass wrapper */
+.glass-stage{
+  position:sticky;top:32px;display:flex;flex-direction:column;align-items:center;
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:28px 24px 20px;box-shadow:var(--shadow);
+}
+.glass-title{
+  font-family:'Fraunces',serif;font-size:14px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px;font-size:11px
+}
+
+/* SVG Glass */
+#cocktail-svg{width:160px;height:240px;overflow:visible;filter:drop-shadow(0 4px 16px rgba(200,113,90,.18))}
+
+/* Pour animation */
+@keyframes pourIn{
+  from{opacity:0;transform:scaleY(0);transform-origin:top}
+  to{opacity:1;transform:scaleY(1);transform-origin:top}
+}
+.liquid-layer{animation:pourIn .5s cubic-bezier(.4,0,.2,1) both}
+
+@keyframes dropFall{
+  0%{transform:translateY(-60px);opacity:0}
+  60%{opacity:1}
+  100%{transform:translateY(0);opacity:0}
+}
+.drop{animation:dropFall .6s ease-in both}
+
+/* Ingredient chips */
+.ing-chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:14px;min-height:24px}
+.ing-chip{
+  font-size:11px;padding:2px 8px;border-radius:100px;
+  color:#fff;font-weight:500;opacity:.9
+}
+
+/* Glass label */
+.glass-label{
+  margin-top:14px;text-align:center;font-size:12px;color:var(--muted);
+  min-height:18px;font-style:italic;font-family:'Fraunces',serif
+}
+
+/* Shake button */
+.shake-btn{
+  margin-top:14px;background:var(--terra-dim);color:var(--terracotta);
+  border:1.5px solid rgba(200,113,90,.25);border-radius:100px;
+  padding:6px 18px;font-size:12px;font-weight:500;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:background .15s;
+}
+.shake-btn:hover{background:rgba(200,113,90,.18)}
+@keyframes shake{
+  0%,100%{transform:rotate(0)}
+  20%{transform:rotate(-8deg)}
+  40%{transform:rotate(8deg)}
+  60%{transform:rotate(-5deg)}
+  80%{transform:rotate(5deg)}
+}
+.is-shaking{animation:shake .5s ease}
+
+/* Option cards */
+.option-group{margin-bottom:20px}
+.option-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:500;margin-bottom:8px}
+.option-pills{display:flex;flex-wrap:wrap;gap:6px}
+.option-pill{
+  padding:5px 13px;border-radius:100px;font-size:12px;border:1.5px solid var(--border);
+  background:var(--bg);color:var(--muted);cursor:pointer;transition:all .15s;
+  font-family:'DM Sans',sans-serif
+}
+.option-pill:hover{border-color:var(--muted);color:var(--text)}
+.option-pill.selected{color:#fff;border-color:transparent}
+
+#r-creator-results{margin-top:24px}
+
+/* ════════════════════════════════════════
+   COCKTAIL DETAIL PAGE
+════════════════════════════════════════ */
+.detail-back{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--muted);font-size:13px;cursor:pointer;
+  margin-bottom:28px;transition:color .15s;background:none;border:none;
+  font-family:'DM Sans',sans-serif;padding:0;
+}
+.detail-back:hover{color:var(--terracotta)}
+.detail-back svg{width:16px;height:16px}
+
+.detail-hero{
+  display:grid;grid-template-columns:1fr auto;gap:32px;
+  align-items:start;margin-bottom:32px;
+  padding-bottom:28px;border-bottom:1.5px solid var(--border);
+}
+.detail-name{
+  font-family:'Fraunces',serif;font-size:42px;font-weight:600;
+  line-height:1.1;margin-bottom:10px;
+}
+.detail-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.detail-rating-big{
+  text-align:center;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);min-width:120px;
+}
+.detail-rating-num{
+  font-family:'Fraunces',serif;font-size:48px;font-weight:600;
+  color:var(--terracotta);line-height:1;
+}
+.detail-rating-stars{color:var(--terracotta);font-size:14px;letter-spacing:2px;margin:4px 0}
+.detail-rating-count{color:var(--muted);font-size:11px}
+
+.detail-section-title{
+  font-family:'Fraunces',serif;font-size:20px;font-weight:600;
+  margin-bottom:16px;
+}
+.detail-ingredients{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:10px;margin-bottom:32px;
+}
+.detail-ingredient{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:12px 16px;
+  display:flex;flex-direction:column;gap:2px;box-shadow:var(--shadow);
+}
+.detail-ingredient .ing-name{font-size:13px;font-weight:500}
+.detail-ingredient .ing-measure{font-size:12px;color:var(--muted)}
+
+.detail-instructions{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:20px 24px;
+  line-height:1.9;color:var(--text);font-size:14px;
+  margin-bottom:32px;box-shadow:var(--shadow);
+}
+
+/* Review section */
+.review-form{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:20px 24px;
+  margin-bottom:24px;box-shadow:var(--shadow);
+}
+.review-form-title{font-size:14px;font-weight:500;margin-bottom:14px}
+.review-card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:16px 20px;margin-bottom:10px;
+  box-shadow:var(--shadow);
+}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.review-user{font-weight:500;font-size:13px}
+.review-date{color:var(--muted);font-size:11px}
+.review-stars{color:var(--terracotta);letter-spacing:2px;font-size:13px;margin-bottom:4px}
+.review-caption{color:var(--muted);font-size:13px;line-height:1.6}
+.review-img{width:100%;max-height:200px;object-fit:cover;border-radius:4px;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── Sidebar ── -->
+<nav>
+  <div class="logo">Sip<em>&</em>Match</div>
+  <div id="user-status"></div>
+  <a class="active" data-page="home"><span class="nav-icon">🏠</span> Home</a>
+  <a data-page="search"><span class="nav-icon">🔍</span> Search</a>
+  <a data-page="feed"><span class="nav-icon">📸</span> Feed</a>
+  <a data-page="bars"><span class="nav-icon">🍸</span> Bar Finder</a>
+  <a data-page="creator"><span class="nav-icon">✨</span> Cocktail Creator</a>
+  <a data-page="today"><span class="nav-icon">🎲</span> Today's Pick</a>
+  <a data-page="trending"><span class="nav-icon">📈</span> Trending</a>
+  <a data-page="saved"><span class="nav-icon">🤍</span> Saved</a>
+  <div class="nav-bottom">
+    <a data-page="account"><span class="nav-icon">👤</span> Account</a>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<main>
+
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-eyebrow">Cocktail Discovery</div>
+      <h1 class="hero-title">Find your next<br><em>perfect sip.</em></h1>
+      <p class="hero-body">Search by name or ingredient, see what's trending, find bars nearby, and share your drinks with the community.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-tile" onclick="navigate('search')"><div class="icon">🔍</div><div class="name">Search</div><div class="desc">By name or ingredient</div></div>
+      <div class="feature-tile" onclick="navigate('feed')"><div class="icon">📸</div><div class="name">Feed</div><div class="desc">Community posts</div></div>
+      <div class="feature-tile" onclick="navigate('bars')"><div class="icon">🍸</div><div class="name">Bar Finder</div><div class="desc">Bars in your city</div></div>
+      <div class="feature-tile" onclick="navigate('creator')"><div class="icon">✨</div><div class="name">Creator</div><div class="desc">Build your cocktail</div></div>
+      <div class="feature-tile" onclick="navigate('today')"><div class="icon">🎲</div><div class="name">Today's Pick</div><div class="desc">Random inspiration</div></div>
+      <div class="feature-tile" onclick="navigate('trending')"><div class="icon">📈</div><div class="name">Trending</div><div class="desc">Most posted drinks</div></div>
+      <div class="feature-tile" onclick="navigate('saved')"><div class="icon">🤍</div><div class="name">Saved</div><div class="desc">Your favourite cocktails</div></div>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="page" id="page-search">
+    <h1 class="page-title">Search</h1>
+    <p class="page-sub">Find cocktails by name, ingredient, or mood.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="search-name">By Name</button>
+      <button class="tab" data-tab="search-ingredient">By Ingredient</button>
+      <button class="tab" data-tab="search-multi">Multi Ingredient</button>
+      <button class="tab" data-tab="search-mood">By Mood</button>
+    </div>
+    <div class="tab-panel active" id="search-name">
+      <div class="row">
+        <div class="ac-wrap">
+          <label style="display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:500">Cocktail name</label>
+          <input id="s-name" placeholder="e.g. Margarita" autocomplete="off"
+            oninput="acInput(this.value)"
+            onkeydown="acKeydown(event)"
+            onblur="setTimeout(()=>acClose(),150)"/>
+          <div class="ac-dropdown" id="ac-dropdown"></div>
+        </div>
+        <button class="btn btn-primary" onclick="searchByName()" style="margin-top:22px">Search</button>
+      </div>
+      <div class="loader" id="l-name"><div class="spinner"></div> Searching…</div>
+      <div id="r-name" style="margin-top:18px"></div>
+    </div>
+    <div class="tab-panel" id="search-ingredient">
+      <div class="row">
+        <div class="ing-ac-wrap">
+          <label style="display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:500">Ingredient</label>
+          <input id="s-ing" placeholder="e.g. Vodka" autocomplete="off"
+            oninput="ingAcInput('s-ing','ing-ac-dd',this.value, acIngSelect)"
+            onkeydown="ingAcKeydown(event,'ing-ac-dd','s-ing', acIngSelect)"
+            onblur="setTimeout(()=>ingAcClose('ing-ac-dd'),150)"/>
+          <div class="ing-ac-dropdown ac-dropdown" id="ing-ac-dd"></div>
+        </div>
+        <button class="btn btn-primary" onclick="searchByIngredient()" style="margin-top:22px">Search</button>
+      </div>
+      <div class="loader" id="l-ing"><div class="spinner"></div> Searching…</div>
+      <div id="r-ing" style="margin-top:18px"></div>
+    </div>
+    <div class="tab-panel" id="search-multi">
+      <label>Ingredients</label>
+      <div class="tag-input-wrap" style="position:relative">
+        <div class="ing-ac-wrap" style="flex:1">
+          <input id="s-multi-input" placeholder="Type an ingredient and press Enter" autocomplete="off"
+            oninput="ingAcInput('s-multi-input','multi-ac-dd',this.value, acMultiSelect)"
+            onkeydown="ingAcKeydown(event,'multi-ac-dd','s-multi-input', acMultiSelect)"
+            onblur="setTimeout(()=>ingAcClose('multi-ac-dd'),150)"/>
+          <div class="ing-ac-dropdown ac-dropdown" id="multi-ac-dd"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addIngredientTag({key:'Enter'})">Add</button>
+      </div>
+      <div class="tags" id="s-multi-tags"></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="searchMulti()">Search</button>
+      <div class="loader" id="l-multi"><div class="spinner"></div> Searching…</div>
+      <div id="r-multi" style="margin-top:18px"></div>
+    </div>
+    <div class="tab-panel" id="search-mood">
+      <label style="margin-bottom:10px;display:block">How are you feeling?</label>
+      <div class="mood-pills">
+        <button class="mood-pill" onclick="selectMood(this,'happy')">😊 Happy</button>
+        <button class="mood-pill" onclick="selectMood(this,'relaxed')">😌 Relaxed</button>
+        <button class="mood-pill" onclick="selectMood(this,'party')">🎉 Party</button>
+        <button class="mood-pill" onclick="selectMood(this,'romantic')">💕 Romantic</button>
+        <button class="mood-pill" onclick="selectMood(this,'adventurous')">🗺 Adventurous</button>
+        <button class="mood-pill" onclick="selectMood(this,'celebratory')">🥂 Celebratory</button>
+        <button class="mood-pill" onclick="selectMood(this,'sophisticated')">🎩 Sophisticated</button>
+        <button class="mood-pill" onclick="selectMood(this,'stressed')">😮‍💨 Stressed</button>
+        <button class="mood-pill" onclick="selectMood(this,'tropical')">🌴 Tropical</button>
+        <button class="mood-pill" onclick="selectMood(this,'energetic')">⚡ Energetic</button>
+      </div>
+      <div class="loader" id="l-mood"><div class="spinner"></div> Finding match…</div>
+      <div id="r-mood" style="margin-top:18px"></div>
+    </div>
+  </section>
+
+  <!-- FEED -->
+  <section class="page" id="page-feed">
+    <h1 class="page-title">Feed</h1>
+    <p class="page-sub">See what the community is sipping.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="feed-view">Browse</button>
+      <button class="tab" data-tab="feed-post">Post a Drink</button>
+    </div>
+    <div class="tab-panel active" id="feed-view">
+      <div id="feed-user-req" class="alert alert-error" style="display:none">Log in first — go to <strong>Account</strong> in the sidebar to sign in.</div>
+      <div class="loader" id="l-feed"><div class="spinner"></div> Loading feed…</div>
+      <div id="r-feed"></div>
+    </div>
+    <div class="tab-panel" id="feed-post">
+      <div id="post-login-req" class="alert alert-error" style="display:none">Log in to post.</div>
+      <div class="card">
+        <div class="form-group">
+          <label>Cocktail name *</label>
+          <div class="ac-wrap" style="position:relative">
+            <input id="p-cocktail" placeholder="Search for a cocktail in our database…" autocomplete="off"
+              oninput="postCocktailInput(this.value)"
+              onkeydown="postCocktailKeydown(event)"
+              onblur="setTimeout(()=>ingAcClose('post-ac-dd'),150)"/>
+            <div class="ac-dropdown" id="post-ac-dd"></div>
+          </div>
+          <div id="p-cocktail-status" style="font-size:11px;margin-top:4px;min-height:16px"></div>
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="stars-input" id="star-input">
+            <button onclick="setStar(1)">★</button><button onclick="setStar(2)">★</button>
+            <button onclick="setStar(3)">★</button><button onclick="setStar(4)">★</button><button onclick="setStar(5)">★</button>
+          </div>
+        </div>
+        <div class="form-group"><label>Caption</label><textarea id="p-caption" placeholder="Share your thoughts…"></textarea></div>
+        <div class="form-group"><label>Image URL (optional)</label><input id="p-image" placeholder="https://…"/></div>
+        <button class="btn btn-primary" onclick="createPost()">Post</button>
+      </div>
+      <div id="r-post"></div>
+    </div>
+  </section>
+
+  <!-- BARS -->
+  <section class="page" id="page-bars">
+    <h1 class="page-title">Bar Finder</h1>
+    <p class="page-sub">Discover cocktail bars near you.</p>
+    <div class="card">
+      <div class="grid-2">
+        <div class="form-group"><label>City *</label><input id="b-city" placeholder="Amsterdam" autocomplete="address-level2" onkeydown="if(event.key==='Enter')findBars()"/></div>
+        <div class="form-group"><label>Bar name / style</label><input id="b-name" placeholder="rooftop, cozy…" autocomplete="off" onkeydown="if(event.key==='Enter')findBars()"/></div>
+        <div class="form-group"><label>Min. rating</label>
+          <select id="b-rating">
+            <option value="">Any</option><option value="2">2.0+</option><option value="3">3.0+</option>
+            <option value="3.5">3.5+</option><option value="4">4.0+</option><option value="4.5">4.5+</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Price range</label>
+          <select id="b-price">
+            <option value="">Any</option><option value="1">€ Cheap</option><option value="2">€€ Moderate</option>
+            <option value="3">€€€ Expensive</option><option value="4">€€€€ Very expensive</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="findBars()">Find Bars</button>
+    </div>
+    <div class="loader" id="l-bars"><div class="spinner"></div> Searching…</div>
+    <div id="r-bars"></div>
+  </section>
+
+  <!-- ════ COCKTAIL CREATOR ════ -->
+  <section class="page" id="page-creator">
+    <h1 class="page-title">Cocktail Creator</h1>
+    <p class="page-sub">Pick your preferences and watch your drink come together.</p>
+
+    <div class="creator-layout">
+      <!-- Controls -->
+      <div class="creator-controls">
+
+        <div class="option-group">
+          <div class="option-label">Flavour</div>
+          <div class="option-pills" id="pills-flavour">
+            <button class="option-pill" data-key="flavour" data-val="sweet" onclick="selectPill(this)">Sweet 🍬</button>
+            <button class="option-pill" data-key="flavour" data-val="sour" onclick="selectPill(this)">Sour 🍋</button>
+            <button class="option-pill" data-key="flavour" data-val="bitter" onclick="selectPill(this)">Bitter 🌿</button>
+            <button class="option-pill" data-key="flavour" data-val="fruity" onclick="selectPill(this)">Fruity 🍓</button>
+            <button class="option-pill" data-key="flavour" data-val="fresh" onclick="selectPill(this)">Fresh 🌱</button>
+            <button class="option-pill" data-key="flavour" data-val="creamy" onclick="selectPill(this)">Creamy 🥛</button>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <div class="option-label">Base Spirit</div>
+          <div class="option-pills" id="pills-spirit">
+            <button class="option-pill" data-key="base_spirit" data-val="Vodka" onclick="selectPill(this)">Vodka</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Gin" onclick="selectPill(this)">Gin</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Rum" onclick="selectPill(this)">Rum</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Tequila" onclick="selectPill(this)">Tequila</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Whiskey" onclick="selectPill(this)">Whiskey</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Bourbon" onclick="selectPill(this)">Bourbon</button>
+            <button class="option-pill" data-key="base_spirit" data-val="Brandy" onclick="selectPill(this)">Brandy</button>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <div class="option-label">Key Ingredient</div>
+          <div class="row">
+            <div class="ing-ac-wrap" style="flex:1">
+              <input id="c-ingredient" placeholder="e.g. Lime juice" autocomplete="off"
+                oninput="ingAcInput('c-ingredient','creator-ac-dd',this.value, acCreatorSelect)"
+                onkeydown="ingAcKeydown(event,'creator-ac-dd','c-ingredient', acCreatorSelect)"
+                onblur="setTimeout(()=>ingAcClose('creator-ac-dd'),150)"/>
+              <div class="ing-ac-dropdown ac-dropdown" id="creator-ac-dd"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="addCustomIngredient()">Add</button>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <div class="option-label">Alcoholic</div>
+          <div class="option-pills" id="pills-alcoholic">
+            <button class="option-pill" data-key="alcoholic" data-val="Alcoholic" onclick="selectPill(this)">Alcoholic 🍷</button>
+            <button class="option-pill" data-key="alcoholic" data-val="Non alcoholic" onclick="selectPill(this)">Non-alcoholic 🧃</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary" onclick="createCocktail()">Find Matches</button>
+          <button class="btn btn-ghost" onclick="resetCreator()">Reset</button>
+        </div>
+        <div class="loader" id="l-creator"><div class="spinner"></div> Mixing…</div>
+        <div id="r-creator-results"></div>
+      </div>
+
+      <!-- THE GLASS -->
+      <div class="glass-stage">
+        <div class="glass-title">Your Glass</div>
+
+        <svg id="cocktail-svg" viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="glass-clip">
+              <!-- Tapered glass shape: wide top, slightly narrower bottom -->
+              <polygon points="22,30 138,30 118,210 42,210"/>
+            </clipPath>
+            <linearGradient id="glass-shine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="30%" stop-color="rgba(255,255,255,0.25)"/>
+              <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+            </linearGradient>
+            <linearGradient id="glass-body" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(220,210,200,0.18)"/>
+              <stop offset="100%" stop-color="rgba(240,235,228,0.08)"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Liquid layers container (clipped to glass) -->
+          <g clip-path="url(#glass-clip)" id="liquid-group">
+            <!-- fills from bottom up; JS inserts rects here -->
+          </g>
+
+          <!-- Glass outline -->
+          <!-- Base -->
+          <rect x="52" y="210" width="56" height="6" rx="3" fill="rgba(180,165,150,0.5)"/>
+          <rect x="44" y="216" width="72" height="5" rx="2.5" fill="rgba(160,145,130,0.4)"/>
+
+          <!-- Stem -->
+          <rect x="76" y="195" width="8" height="16" rx="2" fill="rgba(180,165,150,0.4)"/>
+
+          <!-- Glass walls -->
+          <polygon points="22,30 138,30 118,210 42,210" fill="url(#glass-body)" stroke="rgba(180,165,150,0.6)" stroke-width="2.5" fill-opacity="0.3"/>
+
+          <!-- Shine overlay -->
+          <polygon points="22,30 138,30 118,210 42,210" fill="url(#glass-shine)" opacity="0.7"/>
+
+          <!-- Rim highlight -->
+          <line x1="22" y1="30" x2="138" y2="30" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+
+          <!-- Drop animation container -->
+          <g id="drop-group"></g>
+        </svg>
+
+        <div class="ing-chips" id="glass-chips"></div>
+        <div class="glass-label" id="glass-label">Select your preferences above</div>
+        <button class="shake-btn" id="shake-btn" onclick="shakeGlass()" style="display:none">🍹 Shake!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODAY -->
+  <section class="page" id="page-today">
+    <h1 class="page-title">Today's Pick</h1>
+    <p class="page-sub">A cocktail suggested just for today.</p>
+    <button class="btn btn-primary" onclick="getTodaysCocktail()">🎲 Surprise me</button>
+    <div class="loader" id="l-today"><div class="spinner"></div> Picking…</div>
+    <div id="r-today" style="margin-top:24px"></div>
+  </section>
+
+  <!-- TRENDING -->
+  <section class="page" id="page-trending">
+    <h1 class="page-title">Trending</h1>
+    <p class="page-sub">The most posted cocktails right now.</p>
+    <button class="btn btn-primary" onclick="loadTrending()">Load Trending</button>
+    <div class="loader" id="l-trending"><div class="spinner"></div> Loading…</div>
+    <div id="r-trending" style="margin-top:24px"></div>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section class="page" id="page-account">
+    <!-- LOGGED OUT VIEW -->
+    <div id="acc-loggedout">
+      <div id="acc-login-view">
+        <h1 class="page-title">Welcome back</h1>
+        <p class="page-sub">Log in to access your feed, save cocktails, and post reviews.</p>
+        <div class="card" style="max-width:400px">
+          <div class="form-group"><label>Username</label><input id="login-user" placeholder="Your username" autocomplete="username" onkeydown="if(event.key==='Enter')login()"/></div>
+          <div class="form-group"><label>Password</label><input id="login-pass" type="password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/></div>
+          <button class="btn btn-primary" style="width:100%" onclick="login()">Log in</button>
+          <div id="r-login" style="margin-top:10px"></div>
+          <div style="text-align:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--muted)">Don't have an account?</span>
+            <button onclick="showRegister()" style="background:none;border:none;color:var(--terracotta);font-size:13px;font-weight:500;cursor:pointer;margin-left:6px;font-family:'DM Sans',sans-serif">Register →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="acc-register-view" style="display:none">
+        <h1 class="page-title">Create an account</h1>
+        <p class="page-sub">Join Sip&amp;Match to save cocktails, post to the feed, and leave reviews.</p>
+        <div class="card" style="max-width:400px">
+          <div class="form-group"><label>Username</label><input id="reg-user" placeholder="Pick a username" autocomplete="username" onkeydown="if(event.key==='Enter')register()"/></div>
+          <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter')register()"/></div>
+          <div class="form-group"><label>Password</label><input id="reg-pass" type="password" placeholder="8+ chars, uppercase, digit or symbol" autocomplete="new-password" onkeydown="if(event.key==='Enter')register()"/></div>
+          <button class="btn btn-primary" style="width:100%" onclick="register()">Create account</button>
+          <div id="r-register" style="margin-top:10px"></div>
+          <div style="text-align:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--muted)">Already have an account?</span>
+            <button onclick="showLogin()" style="background:none;border:none;color:var(--terracotta);font-size:13px;font-weight:500;cursor:pointer;margin-left:6px;font-family:'DM Sans',sans-serif">Log in →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGGED IN VIEW -->
+    <div id="acc-loggedin" style="display:none">
+      <h1 class="page-title" id="acc-greeting">Account</h1>
+      <p class="page-sub">Manage your Sip&amp;Match settings.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="acc-change">Change Password</button>
+        <button class="tab" data-tab="acc-delete">Delete Account</button>
+      </div>
+      <div class="tab-panel active" id="acc-change">
+        <div class="card" style="max-width:400px">
+          <div class="form-group"><label>Current password</label><input id="cp-old" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')changePassword()"/></div>
+          <div class="form-group"><label>New password</label><input id="cp-new" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')changePassword()"/></div>
+          <button class="btn btn-primary" onclick="changePassword()">Update password</button>
+          <div id="r-cp" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="acc-delete">
+        <div class="card" style="max-width:400px">
+          <div class="alert alert-error">This permanently deletes your account.</div>
+          <div class="form-group"><label>Password</label><input id="del-pass" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')deleteAccount()"/></div>
+          <button class="btn btn-danger" onclick="deleteAccount()">Delete my account</button>
+          <div id="r-del" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div style="margin-top:24px">
+        <button class="btn btn-ghost" onclick="logout()">Log out</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOM COCKTAIL BUILDER -->
+  <section class="page" id="page-custom">
+    <button class="detail-back" onclick="goBack()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3L5 8l5 5"/></svg>
+      Back to Creator
+    </button>
+    <div class="custom-page-header">
+      <div class="custom-page-icon">🧪</div>
+      <div>
+        <h1 class="page-title" style="margin-bottom:4px">Create Your Cocktail</h1>
+        <p style="color:var(--muted);font-size:13px">No match found in our database — build your own recipe below.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>Cocktail name *</label>
+        <input id="custom-name" placeholder="Give your creation a name…" autocomplete="off"/>
+      </div>
+
+      <div class="form-group">
+        <label>Glass type</label>
+        <select id="custom-glass">
+          <option value="">— Select —</option>
+          <option>Cocktail glass</option><option>Highball glass</option><option>Old-fashioned glass</option>
+          <option>Martini glass</option><option>Margarita glass</option><option>Champagne flute</option>
+          <option>Collins glass</option><option>Wine glass</option><option>Copper mug</option>
+          <option>Hurricane glass</option><option>Shot glass</option><option>Beer mug</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select id="custom-category">
+          <option value="">— Select —</option>
+          <option>Ordinary Drink</option><option>Cocktail</option><option>Shot</option>
+          <option>Coffee / Tea</option><option>Punch / Party Drink</option><option>Beer</option>
+          <option>Soft Drink</option><option>Other/Unknown</option>
+        </select>
+      </div>
+
+      <label style="display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;font-weight:500">Ingredients & Amounts</label>
+      <div id="custom-ings-list"></div>
+
+      <div class="add-ing-row">
+        <div class="ing-ac-wrap" style="flex:1">
+          <input id="custom-add-ing" placeholder="Add ingredient…" autocomplete="off"
+            oninput="ingAcInput('custom-add-ing','custom-ac-dd',this.value, acCustomIngSelect)"
+            onkeydown="ingAcKeydown(event,'custom-ac-dd','custom-add-ing', acCustomIngSelect)"
+            onblur="setTimeout(()=>ingAcClose('custom-ac-dd'),150)"/>
+          <div class="ing-ac-dropdown ac-dropdown" id="custom-ac-dd"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="customAddIngredient()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>Instructions *</label>
+        <textarea id="custom-instructions" placeholder="Step by step: how to mix this cocktail…" style="min-height:120px"></textarea>
+      </div>
+    </div>
+
+    <div class="custom-preview" id="custom-preview" style="display:none"></div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" onclick="saveCustomCocktail()">Save to My Cocktails</button>
+      <button class="btn btn-ghost" onclick="previewCustomCocktail()">Preview</button>
+    </div>
+    <div id="r-custom" style="margin-top:14px"></div>
+  </section>
+
+  <!-- SAVED -->
+  <section class="page" id="page-saved">
+    <h1 class="page-title">Saved</h1>
+    <p class="page-sub">Cocktails you've hearted.</p>
+    <div id="r-saved"></div>
+  </section>
+
+  <!-- COCKTAIL DETAIL -->
+  <section class="page" id="page-cocktail">
+    <button class="detail-back" id="detail-back-btn" onclick="goBack()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3L5 8l5 5"/></svg>
+      Back
+    </button>
+    <div class="loader" id="l-cocktail"><div class="spinner"></div> Loading…</div>
+    <div id="r-cocktail"></div>
+  </section>
+
+</main>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════
+   CONSTANTS & STATE
+══════════════════════════════════════════════════════ */
+const API = 'http://127.0.0.1:5000';
+let currentUser   = null;   // {username, id}
+let starRating    = 0;
+let multiIngredients = [];
+
+/* ── Name cache for cocktail autocomplete ── */
+let _nameCache        = null;
+let _nameCacheLoading = false;
+
+/* ── Cocktail-name search AC (search page) ── */
+let _acTimer  = null;
+let _acItems  = [];
+let _acFocus  = -1;
+
+/* ── Ingredient AC (shared engine) ── */
+const _ingAcCallbacks = {};
+const _ingAcTimers    = {};
+const _ingAcItems     = {};
+const _ingAcFocus     = {};
+
+/* ── Feed post AC ── */
+let _postCocktailValid = false;
+let _postAcItems       = [];
+let _postAcFocus       = -1;
+let _postAcTimer       = null;
+
+/* ── Saved cocktails (localStorage) ── */
+let savedCocktails = JSON.parse(localStorage.getItem('sip_saved') || '{}');
+
+/* ── Creator glass state ── */
+const GLASS = { topX1:22, topX2:138, topY:30, botX1:42, botX2:118, botY:210, maxH:180 };
+const COLOUR_MAP = {
+  'vodka':'#D4E8F5','gin':'#B8E0C8','rum':'#F4C87A','tequila':'#E8E06A',
+  'whiskey':'#D4843A','bourbon':'#C86A2A','brandy':'#C8785A',
+  'sweet':'#F4A0C8','sour':'#C8E840','bitter':'#7AB898','fruity':'#F46080',
+  'fresh':'#A0E8A0','creamy':'#F8E0C0','alcoholic':'#C89878','non alcoholic':'#A8D8D0',
+};
+const FALLBACK_COLOURS = ['#F4A86C','#9DD5B8','#A8C4E8','#E8A0D0','#C8D888','#F4C87A','#D4A0C8','#8ABCD4'];
+let fallbackIdx = 0;
+const creatorState = { flavour:null, base_spirit:null, ingredient:null, alcoholic:null };
+const glassLayers  = [];
+
+/* ── Ingredient list for autocomplete ── */
+const INGREDIENT_LIST = [
+  'Vodka','Gin','Rum','Tequila','Whiskey','Bourbon','Brandy','Triple sec','Cointreau',
+  'Kahlua','Baileys','Amaretto','Champagne','Prosecco','Beer','Wine','Port','Vermouth',
+  'Campari','Aperol','Absinthe','Chartreuse','Midori','Peach schnapps','Blue curacao',
+  'Grenadine','Sugar','Simple syrup','Honey','Agave syrup','Brown sugar',
+  'Lemon juice','Lime juice','Orange juice','Grapefruit juice','Pineapple juice',
+  'Cranberry juice','Apple juice','Tomato juice','Coconut cream','Coconut milk',
+  'Cream','Heavy cream','Milk','Half and half','Egg white','Egg','Butter',
+  'Soda water','Tonic water','Ginger beer','Ginger ale','Cola','Sprite',
+  'Mint','Basil','Thyme','Rosemary','Sage','Cucumber','Celery','Jalapeño',
+  'Ice','Salt','Black pepper','Tabasco','Worcestershire sauce','Horseradish',
+  'Orange','Lemon','Lime','Grapefruit','Pineapple','Mango','Passion fruit',
+  'Strawberry','Raspberry','Blueberry','Peach','Watermelon','Apple','Cherry',
+  'Olive','Maraschino cherry','Coconut','Banana','Kiwi',
+  'Coffee','Espresso','Tea','Matcha','Cacao','Chocolate syrup','Vanilla extract',
+  'Cinnamon','Nutmeg','Cloves','Star anise','Cardamom','Ginger',
+  'Angostura bitters','Peychaud bitters','Orange bitters','Mole bitters',
+  'Maraschino liqueur','St-Germain','Benedictine','Drambuie','Frangelico',
+  'Pimms','Sloe gin','Mezcal','Pisco','Cachaça','Sake','Shochu','Soju',
+  'Whipped cream','Ice cream','Sorbet','Yogurt','Oat milk','Almond milk',
+  'Honey syrup','Lavender syrup','Rose syrup','Orgeat','Falernum',
+  'Peach puree','Mango puree','Strawberry puree','Raspberry puree',
+  'Rose water','Orange flower water','Sparkling water','Coconut water',
+].sort((a,b) => a.localeCompare(b));
+
+/* ══════════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════════ */
+function loader(id, on) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('active', on);
+}
+function html(id, content) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = content;
+}
+function alertHtml(msg, type='error') {
+  return `<div class="alert alert-${type}">${msg}</div>`;
+}
+function contrastColor(hex) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return (r*299+g*587+b*114)/1000 > 150 ? '#2C2420' : '#fff';
+}
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers:{'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const data = await r.json();
+  return { ok: r.ok, status: r.status, data };
+}
+
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+let _prevPage = 'home';
+
+function navigate(page) {
+  const current = document.querySelector('.page.active');
+  if (current && !['page-cocktail','page-custom'].includes(current.id)) {
+    _prevPage = current.id.replace('page-','');
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navLink = document.querySelector(`nav a[data-page="${page}"]`);
+  if (navLink) navLink.classList.add('active');
+  if (page === 'feed')  loadFeed();
+  if (page === 'saved') renderSavedPage();
+  window.scrollTo(0, 0);
+}
+function goBack() { navigate(_prevPage || 'home'); }
+
+document.querySelectorAll('nav a[data-page]').forEach(a =>
+  a.addEventListener('click', () => navigate(a.dataset.page))
+);
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const scope = tab.closest('.page');
+    scope.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    scope.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   USER STATE
+══════════════════════════════════════════════════════ */
+function setUser(username, id) {
+  currentUser = { username, id };
+  const el = document.getElementById('user-status');
+  el.textContent = '✓  ' + username;
+  el.classList.add('visible');
+  document.getElementById('acc-loggedout').style.display = 'none';
+  document.getElementById('acc-loggedin').style.display  = 'block';
+  document.getElementById('acc-greeting').textContent = username;
+}
+function clearUser() {
+  currentUser = null;
+  const el = document.getElementById('user-status');
+  el.textContent = '';
+  el.classList.remove('visible');
+  document.getElementById('acc-loggedout').style.display = 'block';
+  document.getElementById('acc-loggedin').style.display  = 'none';
+  showLogin();
+}
+function showRegister() {
+  document.getElementById('acc-login-view').style.display    = 'none';
+  document.getElementById('acc-register-view').style.display = 'block';
+}
+function showLogin() {
+  document.getElementById('acc-register-view').style.display = 'none';
+  document.getElementById('acc-login-view').style.display    = 'block';
+}
+function logout() { clearUser(); navigate('account'); }
+
+/* ══════════════════════════════════════════════════════
+   SAVE SYSTEM
+══════════════════════════════════════════════════════ */
+function isSaved(id) { return !!savedCocktails[String(id)]; }
+
+function toggleSave(id, name, category, alcoholic, glass) {
+  const key = String(id);
+  if (savedCocktails[key]) {
+    delete savedCocktails[key];
+  } else {
+    savedCocktails[key] = { id:key, name, category:category||'', alcoholic:alcoholic||'', glass:glass||'' };
+  }
+  localStorage.setItem('sip_saved', JSON.stringify(savedCocktails));
+  document.querySelectorAll(`.save-btn[data-id="${key}"]`).forEach(btn => refreshSaveBtn(btn, key));
+  if (document.getElementById('page-saved').classList.contains('active')) renderSavedPage();
+}
+function refreshSaveBtn(btn, id) {
+  const saved = isSaved(id);
+  btn.classList.toggle('saved', saved);
+  if (saved) {
+    btn.innerHTML = `<span class="heart">♥</span> Saved`;
+    void btn.offsetWidth;
+    btn.classList.add('just-saved');
+  } else {
+    btn.innerHTML = `<span class="heart">♡</span> Save`;
+    btn.classList.remove('just-saved');
+  }
+}
+function renderSavedPage() {
+  const list = Object.values(savedCocktails);
+  if (!list.length) {
+    html('r-saved', `<div class="saved-empty"><div class="icon">🤍</div><p>No saved cocktails yet.<br>Hit the heart on any cocktail to save it here.</p></div>`);
+    return;
+  }
+  html('r-saved', `<div class="saved-grid">${list.map(c => {
+    const isCustom = c.isCustom || String(c.id).startsWith('custom_');
+    const safeId   = c.id.replace(/'/g,"\\'");
+    const safeName = c.name.replace(/'/g,"\\'");
+    const safeCat  = (c.category||'').replace(/'/g,"\\'");
+    const safeAlc  = (c.alcoholic||'').replace(/'/g,"\\'");
+    const safeGls  = (c.glass||'').replace(/'/g,"\\'");
+    const clickFn  = isCustom ? `openCustomCocktailView('${safeId}')` : `openCocktailPage('${safeId}')`;
+    return `<div class="saved-tile" onclick="${clickFn}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <div class="saved-tile-name">${c.name}</div>
+        ${isCustom ? `<span class="badge" style="font-size:10px">Custom</span>` : ''}
+      </div>
+      <div class="saved-tile-meta">${[c.category,c.alcoholic].filter(Boolean).join(' · ')||'Cocktail'}</div>
+      <div class="saved-tile-actions">
+        <span style="font-size:11px;color:var(--terracotta)">${isCustom?'View recipe →':'View page →'}</span>
+        <button class="save-btn saved" data-id="${c.id}"
+          onclick="event.stopPropagation();toggleSave('${safeId}','${safeName}','${safeCat}','${safeAlc}','${safeGls}')">
+          <span class="heart">♥</span> Saved
+        </button>
+      </div>
+    </div>`;
+  }).join('')}</div>`);
+}
+
+/* ══════════════════════════════════════════════════════
+   RENDER HELPERS
+══════════════════════════════════════════════════════ */
+function _safeSaveAttrs(c) {
+  const id   = String(c.idDrink || c.id || '');
+  const name = (c.name || c.strDrink || '').replace(/'/g,"\\'");
+  const cat  = (c.category||'').replace(/'/g,"\\'");
+  const alc  = (c.alcoholic||'').replace(/'/g,"\\'");
+  const gls  = (c.glass||'').replace(/'/g,"\\'");
+  return { id, name, cat, alc, gls };
+}
+
+function renderCocktail(c) {
+  const ings = (c.ingredients||[]).filter(Boolean);
+  const meas = c.measurements||[];
+  const ingList = ings.map((ing,i)=>`<span class="badge">${meas[i]?meas[i]+' ':''}${ing}</span>`).join('');
+  const stars = c.average_rating
+    ? '★'.repeat(Math.round(c.average_rating)) + `<small style="color:var(--muted);margin-left:4px">(${c.review_count} reviews)</small>`
+    : '';
+  const {id, name, cat, alc, gls} = _safeSaveAttrs(c);
+  const saved = id && isSaved(id);
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div>
+        <div class="card-title">${c.name||c.strDrink||'—'}</div>
+        <div class="card-meta">${[c.category,c.alcoholic,c.glass].filter(Boolean).join(' · ')}</div>
+        ${stars?`<div style="color:var(--terracotta);font-size:13px;margin-bottom:8px">${stars}</div>`:''}
+      </div>
+      <div style="display:flex;gap:7px;flex-shrink:0;margin-top:2px;align-items:center">
+        ${id?`<button class="save-btn ${saved?'saved':''}" data-id="${id}"
+          onclick="toggleSave('${id}','${name}','${cat}','${alc}','${gls}')">
+          <span class="heart">${saved?'♥':'♡'}</span> ${saved?'Saved':'Save'}
+        </button>`:''}
+        ${id?`<button class="btn btn-primary btn-sm view-cocktail-btn" data-id="${id}">View page →</button>`:''}
+      </div>
+    </div>
+    ${c.instructions?`<p class="card-body" style="font-size:13px;color:var(--muted);margin-bottom:12px">${c.instructions}</p>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:5px">${ingList}</div>
+  </div>`;
+}
+
+function renderCocktailList(items) {
+  if (!items.length) return `<div class="empty"><div class="icon">🍹</div>No cocktails found.</div>`;
+  return items.map(c => {
+    const id   = c.idDrink || c.id;
+    const name = c.name || c.strDrink || '—';
+    return `<div class="card" style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span style="font-size:14px">${name}</span>
+      ${id?`<button class="btn btn-ghost btn-sm view-cocktail-btn" data-id="${id}">View →</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+// Global delegation for all "View" buttons
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.view-cocktail-btn');
+  if (btn) openCocktailPage(btn.dataset.id);
+});
+
+/* ══════════════════════════════════════════════════════
+   COCKTAIL DETAIL PAGE
+══════════════════════════════════════════════════════ */
+async function openCocktailPage(id) {
+  navigate('cocktail');
+  html('r-cocktail', '');
+  loader('l-cocktail', true);
+  try {
+    const {ok, data} = await api(`/cocktail-by-id?id_drink=${id}`);
+    if (!ok) { html('r-cocktail', alertHtml(data.error||'Cocktail not found.')); return; }
+    html('r-cocktail', renderDetailPage(data));
+    window._detailCocktailName = data.name;
+    window._detailStarRating   = 0;
+    document.querySelectorAll('#detail-star-input button').forEach((b,i) => {
+      b.addEventListener('click', () => {
+        window._detailStarRating = i+1;
+        document.querySelectorAll('#detail-star-input button').forEach((s,j)=>s.classList.toggle('on',j<=i));
+      });
+    });
+  } catch { html('r-cocktail', alertHtml('Could not reach the server.')); }
+  loader('l-cocktail', false);
+}
+
+function renderDetailPage(c) {
+  const ings        = (c.ingredients||[]).filter(Boolean);
+  const meas        = c.measurements||[];
+  const avgRating   = c.average_rating||0;
+  const reviewCount = c.review_count||0;
+  const starsDisplay= avgRating
+    ? '★'.repeat(Math.round(avgRating))+'☆'.repeat(5-Math.round(avgRating)) : '☆☆☆☆☆';
+  const {id, name, cat, alc, gls} = _safeSaveAttrs(c);
+  const saved = id && isSaved(id);
+
+  const ingCards = ings.map((ing,i)=>`
+    <div class="detail-ingredient">
+      <span class="ing-name">${ing}</span>
+      ${meas[i]?`<span class="ing-measure">${meas[i]}</span>`:''}
+    </div>`).join('');
+
+  const reviewForm = currentUser && currentUser.id ? `
+    <div class="review-form">
+      <div class="review-form-title">Leave a review</div>
+      <div class="form-group"><label>Rating</label>
+        <div class="stars-input" id="detail-star-input">
+          <button type="button">★</button><button type="button">★</button>
+          <button type="button">★</button><button type="button">★</button><button type="button">★</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Caption</label><textarea id="detail-caption" placeholder="What did you think?"></textarea></div>
+      <div class="form-group"><label>Image URL (optional)</label><input id="detail-image" placeholder="https://…"/></div>
+      <button class="btn btn-primary" onclick="submitDetailReview()">Post review</button>
+      <div id="r-detail-review" style="margin-top:10px"></div>
+    </div>` : `<div class="alert alert-error" style="margin-bottom:20px">Log in to leave a review.</div>`;
+
+  return `
+    <div class="detail-hero">
+      <div>
+        <h1 class="detail-name">${c.name||c.strDrink||'—'}</h1>
+        <div class="detail-badges">
+          ${c.category?`<span class="badge badge-muted">${c.category}</span>`:''}
+          ${c.alcoholic?`<span class="badge">${c.alcoholic}</span>`:''}
+          ${c.glass?`<span class="badge badge-sage">${c.glass}</span>`:''}
+        </div>
+        ${id?`<button class="save-btn ${saved?'saved':''}" data-id="${id}" style="margin-top:8px"
+          onclick="toggleSave('${id}','${name}','${cat}','${alc}','${gls}')">
+          <span class="heart">${saved?'♥':'♡'}</span> ${saved?'Saved':'Save cocktail'}
+        </button>`:''}
+      </div>
+      ${avgRating?`<div class="detail-rating-big">
+        <div class="detail-rating-num">${avgRating.toFixed(1)}</div>
+        <div class="detail-rating-stars">${starsDisplay}</div>
+        <div class="detail-rating-count">${reviewCount} review${reviewCount!==1?'s':''}</div>
+      </div>`:''}
+    </div>
+    ${ings.length?`<div class="detail-section-title">Ingredients</div><div class="detail-ingredients">${ingCards}</div>`:''}
+    ${c.instructions?`<div class="detail-section-title">How to make it</div><div class="detail-instructions">${c.instructions}</div>`:''}
+    <div class="detail-section-title">Community reviews</div>
+    ${reviewForm}
+    <div id="detail-reviews-list">
+      ${reviewCount===0
+        ? `<div class="empty" style="padding:24px 0"><div class="icon">💬</div>No reviews yet. Be the first!</div>`
+        : `<div class="alert alert-success" style="margin-bottom:12px">This cocktail has ${reviewCount} review${reviewCount!==1?'s':''}.</div>`}
+    </div>`;
+}
+
+async function submitDetailReview() {
+  if (!currentUser||!currentUser.id) { html('r-detail-review', alertHtml('Log in first.')); return; }
+  const cocktail_name  = window._detailCocktailName;
+  const caption        = document.getElementById('detail-caption').value.trim();
+  const image_url      = document.getElementById('detail-image').value.trim();
+  const review_score   = window._detailStarRating||0;
+  try {
+    const {ok,data} = await api('/create-post','POST',{user_id:currentUser.id, cocktail_name, caption, image_url, review_score});
+    html('r-detail-review', ok ? alertHtml('Review posted!','success') : alertHtml(data.error));
+    if (ok) {
+      document.getElementById('detail-caption').value = '';
+      document.getElementById('detail-image').value   = '';
+      window._detailStarRating = 0;
+      document.querySelectorAll('#detail-star-input button').forEach(b=>b.classList.remove('on'));
+    }
+  } catch { html('r-detail-review', alertHtml('Could not reach the server.')); }
+}
+
+function openCustomCocktailView(id) {
+  const customs = JSON.parse(localStorage.getItem('sip_custom_cocktails')||'[]');
+  const c = customs.find(x => x.id === id);
+  if (!c) return;
+  navigate('cocktail');
+  html('r-cocktail', `
+    <div class="detail-hero"><div>
+      <div style="font-size:11px;color:var(--terracotta);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Your custom cocktail</div>
+      <h1 class="detail-name">${c.name}</h1>
+      <div class="detail-badges">
+        ${c.category?`<span class="badge badge-muted">${c.category}</span>`:''}
+        <span class="badge">Custom</span>
+        ${c.glass?`<span class="badge badge-sage">${c.glass}</span>`:''}
+      </div>
+    </div></div>
+    <div class="detail-section-title">Ingredients</div>
+    <div class="detail-ingredients">
+      ${c.ingredients.map((ing,i)=>`<div class="detail-ingredient">
+        <span class="ing-name">${ing}</span>
+        ${c.measurements[i]?`<span class="ing-measure">${c.measurements[i]}</span>`:''}
+      </div>`).join('')}
+    </div>
+    <div class="detail-section-title">How to make it</div>
+    <div class="detail-instructions">${c.instructions}</div>
+    <div style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="deleteCustomCocktail('${id.replace(/'/g,"\\'")}')">🗑 Delete this recipe</button>
+    </div>`);
+}
+
+function deleteCustomCocktail(id) {
+  if (!confirm('Delete this custom cocktail?')) return;
+  let customs = JSON.parse(localStorage.getItem('sip_custom_cocktails')||'[]');
+  customs = customs.filter(c => c.id !== id);
+  localStorage.setItem('sip_custom_cocktails', JSON.stringify(customs));
+  delete savedCocktails[id];
+  localStorage.setItem('sip_saved', JSON.stringify(savedCocktails));
+  goBack();
+}
+
+/* ══════════════════════════════════════════════════════
+   COCKTAIL NAME AUTOCOMPLETE (search page)
+══════════════════════════════════════════════════════ */
+async function buildNameCache() {
+  if (_nameCache || _nameCacheLoading) return;
+  _nameCacheLoading = true;
+  try {
+    const seeds = ['vodka','gin','rum','lemon juice','sugar','lime juice','whiskey','orange juice'];
+    const results = await Promise.all(
+      seeds.map(s => api(`/search-cocktail-ingredient?ingredient=${encodeURIComponent(s)}`)
+        .then(r => r.ok ? r.data : []).catch(()=>[]))
+    );
+    const seen = new Set();
+    _nameCache = [];
+    results.flat().forEach(c => {
+      const name = c.name || c.strDrink;
+      const id   = c.idDrink || c.id;
+      if (name && id && !seen.has(name)) {
+        seen.add(name);
+        _nameCache.push({ name, id, category: c.category||'' });
+      }
+    });
+    _nameCache.sort((a,b) => a.name.localeCompare(b.name));
+  } catch { _nameCache = []; }
+  _nameCacheLoading = false;
+}
+
+function filterNameCache(q) {
+  const ql = q.toLowerCase();
+  const prefix = _nameCache.filter(c => c.name.toLowerCase().startsWith(ql));
+  const substr  = _nameCache.filter(c => !c.name.toLowerCase().startsWith(ql) && c.name.toLowerCase().includes(ql));
+  return [...prefix, ...substr].slice(0, 8);
+}
+
+async function acInput(val) {
+  acClose();
+  if (!val || val.trim().length < 1) return;
+  clearTimeout(_acTimer);
+  _acTimer = setTimeout(async () => {
+    await buildNameCache();
+    _acItems  = filterNameCache(val.trim());
+    _acFocus  = -1;
+    acRender(val.trim());
+  }, 220);
+}
+
+function acRender(q) {
+  const dd = document.getElementById('ac-dropdown');
+  if (!_acItems.length) {
+    dd.innerHTML = `<div class="ac-empty">No suggestions — press Search to try anyway</div>`;
+  } else {
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    dd.innerHTML = _acItems.map((c,i) => `
+      <div class="ac-item" onmousedown="acSelect(${i})">
+        <span class="ac-item-name">${c.name.replace(re,'<strong>$1</strong>')}</span>
+        ${c.category?`<span class="ac-item-cat">${c.category}</span>`:''}
+      </div>`).join('');
+  }
+  _acFocus = -1;
+  dd.classList.add('open');
+}
+
+function acSelect(idx) {
+  const item = _acItems[idx];
+  if (!item) return;
+  document.getElementById('s-name').value = item.name;
+  acClose();
+  openCocktailPage(item.id);
+}
+
+function acKeydown(e) {
+  const dd    = document.getElementById('ac-dropdown');
+  const items = dd.querySelectorAll('.ac-item');
+  if (e.key==='ArrowDown') { e.preventDefault(); _acFocus=Math.min(_acFocus+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('focused',i===_acFocus)); }
+  else if (e.key==='ArrowUp') { e.preventDefault(); _acFocus=Math.max(_acFocus-1,0); items.forEach((el,i)=>el.classList.toggle('focused',i===_acFocus)); }
+  else if (e.key==='Enter') { e.preventDefault(); if(_acFocus>=0&&_acItems[_acFocus]) acSelect(_acFocus); else { acClose(); searchByName(); } }
+  else if (e.key==='Escape') acClose();
+}
+function acClose() {
+  const dd = document.getElementById('ac-dropdown');
+  if (dd) dd.classList.remove('open');
+  _acFocus = -1;
+}
+
+/* ══════════════════════════════════════════════════════
+   INGREDIENT AUTOCOMPLETE ENGINE (shared)
+══════════════════════════════════════════════════════ */
+function ingAcInput(inputId, ddId, val, onSelect) {
+  _ingAcCallbacks[ddId] = onSelect;
+  ingAcClose(ddId);
+  if (!val || val.trim().length < 1) return;
+  clearTimeout(_ingAcTimers[ddId]);
+  _ingAcTimers[ddId] = setTimeout(() => ingAcShowItems(ddId, val.trim()), 120);
+}
+
+function ingAcShowItems(ddId, q) {
+  const ql     = q.toLowerCase();
+  const prefix = INGREDIENT_LIST.filter(i => i.toLowerCase().startsWith(ql));
+  const substr  = INGREDIENT_LIST.filter(i => !i.toLowerCase().startsWith(ql) && i.toLowerCase().includes(ql));
+  _ingAcItems[ddId] = [...prefix, ...substr].slice(0, 8);
+  _ingAcFocus[ddId] = -1;
+  const dd = document.getElementById(ddId);
+  if (!dd) return;
+  if (!_ingAcItems[ddId].length) {
+    dd.innerHTML = `<div class="ac-empty">No matching ingredients</div>`;
+  } else {
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    dd.innerHTML = _ingAcItems[ddId].map((name, i) =>
+      `<div class="ac-item" onmousedown="ingAcSelect('${ddId}',${i})">${name.replace(re,'<strong>$1</strong>')}</div>`
+    ).join('');
+  }
+  dd.classList.add('open');
+}
+
+function ingAcSelect(ddId, idx) {
+  const item = (_ingAcItems[ddId]||[])[idx];
+  if (!item) return;
+  ingAcClose(ddId);
+  if (_ingAcCallbacks[ddId]) _ingAcCallbacks[ddId](item);
+}
+
+function ingAcKeydown(e, ddId, inputId, onSelect) {
+  _ingAcCallbacks[ddId] = onSelect;
+  const dd = document.getElementById(ddId);
+  if (!dd || !dd.classList.contains('open')) return;
+  const items = dd.querySelectorAll('.ac-item');
+  if (e.key==='ArrowDown') { e.preventDefault(); _ingAcFocus[ddId]=Math.min((_ingAcFocus[ddId]||0)+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('focused',i===_ingAcFocus[ddId])); }
+  else if (e.key==='ArrowUp') { e.preventDefault(); _ingAcFocus[ddId]=Math.max((_ingAcFocus[ddId]||0)-1,0); items.forEach((el,i)=>el.classList.toggle('focused',i===_ingAcFocus[ddId])); }
+  else if (e.key==='Enter') { const f=_ingAcFocus[ddId]; if(f>=0&&(_ingAcItems[ddId]||[])[f]) { e.preventDefault(); e.stopPropagation(); ingAcSelect(ddId,f); } }
+  else if (e.key==='Escape') ingAcClose(ddId);
+}
+
+function ingAcClose(ddId) {
+  const dd = document.getElementById(ddId);
+  if (dd) dd.classList.remove('open');
+  _ingAcFocus[ddId] = -1;
+}
+
+/* Named callbacks for each ingredient input */
+function acIngSelect(val)     { document.getElementById('s-ing').value=val; ingAcClose('ing-ac-dd'); searchByIngredient(); }
+function acMultiSelect(val)   { document.getElementById('s-multi-input').value=val; ingAcClose('multi-ac-dd'); addIngredientTag({key:'Enter'}); }
+function acCreatorSelect(val) { document.getElementById('c-ingredient').value=val; ingAcClose('creator-ac-dd'); addCreatorIngredient(); }
+function acCustomIngSelect(val) { document.getElementById('custom-add-ing').value=val; ingAcClose('custom-ac-dd'); customAddIngredient(val); }
+
+/* ══════════════════════════════════════════════════════
+   SEARCH
+══════════════════════════════════════════════════════ */
+async function searchByName() {
+  acClose();
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) return html('r-name', alertHtml('Enter a cocktail name.'));
+  loader('l-name', true); html('r-name','');
+  try {
+    const {ok,data} = await api(`/search-cocktail-name?name=${encodeURIComponent(name)}`);
+    html('r-name', ok ? renderCocktail(data) : alertHtml(data.error));
+  } catch { html('r-name', alertHtml('Could not reach the server.')); }
+  loader('l-name', false);
+}
+
+async function searchByIngredient() {
+  const ing = document.getElementById('s-ing').value.trim();
+  if (!ing) return html('r-ing', alertHtml('Enter an ingredient.'));
+  loader('l-ing', true); html('r-ing','');
+  try {
+    const {ok,data} = await api(`/search-cocktail-ingredient?ingredient=${encodeURIComponent(ing)}`);
+    html('r-ing', ok ? renderCocktailList(data) : alertHtml(data.error));
+  } catch { html('r-ing', alertHtml('Could not reach the server.')); }
+  loader('l-ing', false);
+}
+
+function addIngredientTag(e) {
+  if (e.key !== 'Enter') return;
+  const input = document.getElementById('s-multi-input');
+  const val   = input.value.trim();
+  if (!val || multiIngredients.includes(val)) { input.value=''; return; }
+  multiIngredients.push(val); input.value='';
+  document.getElementById('s-multi-tags').innerHTML = multiIngredients.map(v =>
+    `<span class="tag">${v} <button onmousedown="removeTag('${v.replace(/'/g,"\\'")}')" >×</button></span>`).join('');
+}
+function removeTag(val) {
+  multiIngredients = multiIngredients.filter(x => x!==val);
+  document.getElementById('s-multi-tags').innerHTML = multiIngredients.map(v =>
+    `<span class="tag">${v} <button onmousedown="removeTag('${v.replace(/'/g,"\\'")}')" >×</button></span>`).join('');
+}
+async function searchMulti() {
+  if (!multiIngredients.length) return html('r-multi', alertHtml('Add at least one ingredient.'));
+  loader('l-multi', true); html('r-multi','');
+  try {
+    const {ok,data} = await api(`/search-cocktail-multiple-ingredients?ingredients=${encodeURIComponent(multiIngredients.join(','))}`);
+    html('r-multi', ok ? renderCocktailList(data) : alertHtml(data.error));
+  } catch { html('r-multi', alertHtml('Could not reach the server.')); }
+  loader('l-multi', false);
+}
+
+function selectMood(el, mood) {
+  document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  searchByMood(mood);
+}
+async function searchByMood(mood) {
+  loader('l-mood', true); html('r-mood','');
+  let lastError='';
+  for (let i=0; i<3; i++) {
+    try {
+      const {ok,data} = await api(`/cocktail-by-mood?mood=${mood}`);
+      if (ok && data && data.name) { html('r-mood', renderCocktail(data)); loader('l-mood',false); return; }
+      lastError = data.error || 'No cocktail found for this mood.';
+    } catch { lastError = 'Could not reach the server.'; break; }
+  }
+  html('r-mood', alertHtml(lastError + ' Some cocktails for this mood may not be in your database yet.'));
+  loader('l-mood', false);
+}
+
+async function searchAndOpenByName(name) {
+  try {
+    const {ok,data} = await api(`/search-cocktail-name?name=${encodeURIComponent(name)}`);
+    if (ok && (data.idDrink||data.id)) { openCocktailPage(data.idDrink||data.id); return; }
+  } catch {}
+  navigate('search');
+  document.getElementById('s-name').value = name;
+  searchByName();
+}
+
+/* ══════════════════════════════════════════════════════
+   FEED
+══════════════════════════════════════════════════════ */
+async function loadFeed() {
+  if (!currentUser) {
+    html('r-feed','');
+    document.getElementById('feed-user-req').style.display='block';
+    return;
+  }
+  document.getElementById('feed-user-req').style.display='none';
+  if (!currentUser.id) { html('r-feed', alertHtml('Could not get your user ID — please log out and back in.')); return; }
+  loader('l-feed', true); html('r-feed','');
+  try {
+    const {ok,data} = await api(`/feed?user_id=${encodeURIComponent(currentUser.id)}`);
+    if (!ok) { html('r-feed', alertHtml(data.error||'Could not load feed.')); loader('l-feed',false); return; }
+    const posts = data.posts||[];
+    if (!posts.length) { html('r-feed',`<div class="empty"><div class="icon">📸</div>No posts yet. Be the first!</div>`); loader('l-feed',false); return; }
+    html('r-feed', posts.map(p => {
+      const stars = p.review_score ? '★'.repeat(p.review_score)+'☆'.repeat(5-p.review_score) : '';
+      const date  = p.created_at ? new Date(p.created_at).toLocaleDateString() : '';
+      const img   = p.image_url  ? `<img src="${p.image_url}" alt="drink" onerror="this.style.display='none'"/>` : '';
+      return `<div class="card post-card">
+        <div class="post-header"><span class="post-user">@${p.username||'anon'}</span><span class="post-time">${date}</span></div>
+        <div class="post-cocktail">${p.cocktail_name}</div>
+        ${stars?`<div class="stars">${stars}</div>`:''}
+        ${p.caption?`<div class="post-caption">${p.caption}</div>`:''}
+        ${img}
+      </div>`;
+    }).join(''));
+  } catch { html('r-feed', alertHtml('Could not reach the server. Make sure Flask is running and CORS is enabled.')); }
+  loader('l-feed', false);
+}
+
+function setStar(n) {
+  starRating = n;
+  document.querySelectorAll('#star-input button').forEach((b,i)=>b.classList.toggle('on',i<n));
+}
+
+/* ── Feed post validation & autocomplete ── */
+function postCocktailInput(val) {
+  _postCocktailValid = false;
+  updatePostStatus('');
+  const dd = document.getElementById('post-ac-dd');
+  if (dd) dd.classList.remove('open');
+  if (!val || val.trim().length < 1) return;
+  clearTimeout(_postAcTimer);
+  _postAcTimer = setTimeout(async () => {
+    await buildNameCache();
+    _postAcItems = filterNameCache(val.trim());
+    _postAcFocus = -1;
+    const dd = document.getElementById('post-ac-dd');
+    if (!_postAcItems.length) {
+      dd.innerHTML = `<div class="ac-empty">No cocktails found — only database cocktails can be reviewed</div>`;
+    } else {
+      const re = new RegExp(`(${val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+      dd.innerHTML = _postAcItems.map((c,i)=>
+        `<div class="ac-item" onmousedown="postAcSelect(${i})">
+          <span class="ac-item-name">${c.name.replace(re,'<strong>$1</strong>')}</span>
+          ${c.category?`<span class="ac-item-cat">${c.category}</span>`:''}
+        </div>`).join('');
+    }
+    dd.classList.add('open');
+  }, 220);
+}
+
+function postAcSelect(idx) {
+  const item = _postAcItems[idx];
+  if (!item) return;
+  document.getElementById('p-cocktail').value = item.name;
+  document.getElementById('post-ac-dd').classList.remove('open');
+  _postCocktailValid = true;
+  updatePostStatus('✓ Found in database', 'var(--success)');
+}
+
+function postCocktailKeydown(e) {
+  const dd    = document.getElementById('post-ac-dd');
+  const items = dd.querySelectorAll('.ac-item');
+  if (e.key==='ArrowDown') { e.preventDefault(); _postAcFocus=Math.min(_postAcFocus+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('focused',i===_postAcFocus)); }
+  else if (e.key==='ArrowUp') { e.preventDefault(); _postAcFocus=Math.max(_postAcFocus-1,0); items.forEach((el,i)=>el.classList.toggle('focused',i===_postAcFocus)); }
+  else if (e.key==='Enter') { e.preventDefault(); if(_postAcFocus>=0&&_postAcItems[_postAcFocus]) postAcSelect(_postAcFocus); else if(_postAcItems.length===1) postAcSelect(0); else dd.classList.remove('open'); }
+  else if (e.key==='Escape') dd.classList.remove('open');
+}
+
+function updatePostStatus(msg, color='var(--muted)') {
+  const el = document.getElementById('p-cocktail-status');
+  if (el) { el.textContent=msg; el.style.color=color; }
+}
+
+async function createPost() {
+  if (!currentUser) { html('r-post', alertHtml('Log in first.')); return; }
+  const cocktail_name = document.getElementById('p-cocktail').value.trim();
+  const caption       = document.getElementById('p-caption').value.trim();
+  const image_url     = document.getElementById('p-image').value.trim();
+  if (!cocktail_name) { html('r-post', alertHtml('Please select a cocktail from the database.')); return; }
+  if (!_postCocktailValid) {
+    try {
+      const {ok,data} = await api(`/search-cocktail-name?name=${encodeURIComponent(cocktail_name)}`);
+      if (!ok || !data || !data.name) {
+        html('r-post', alertHtml('That cocktail isn\'t in our database. Please select one from the dropdown.'));
+        updatePostStatus('✗ Not found in database', 'var(--danger)');
+        return;
+      }
+      _postCocktailValid = true;
+    } catch { html('r-post', alertHtml('Could not reach the server.')); return; }
+  }
+  try {
+    const {ok,data} = await api('/create-post','POST',{user_id:currentUser.id, cocktail_name, caption, image_url, review_score:starRating});
+    html('r-post', ok ? alertHtml('Post shared! ✓','success') : alertHtml(data.error));
+    if (ok) {
+      document.getElementById('p-cocktail').value='';
+      document.getElementById('p-caption').value='';
+      document.getElementById('p-image').value='';
+      setStar(0); _postCocktailValid=false; updatePostStatus('');
+    }
+  } catch { html('r-post', alertHtml('Could not reach the server.')); }
+}
+
+/* ══════════════════════════════════════════════════════
+   BAR FINDER
+══════════════════════════════════════════════════════ */
+async function findBars() {
+  const city = document.getElementById('b-city').value.trim();
+  if (!city) return html('r-bars', alertHtml('Enter a city.'));
+  const name   = document.getElementById('b-name').value.trim();
+  const rating = document.getElementById('b-rating').value;
+  const price  = document.getElementById('b-price').value;
+  const params = new URLSearchParams({home_city:city});
+  if (name)   params.set('name',name);
+  if (rating) params.set('rating',rating);
+  if (price)  params.set('price',price);
+  loader('l-bars', true); html('r-bars','');
+  try {
+    const {ok,data} = await api(`/bar-finder?${params}`);
+    if (!ok) { html('r-bars', alertHtml(data.error)); loader('l-bars',false); return; }
+    const bars = data.results||[];
+    if (!bars.length) { html('r-bars',`<div class="empty"><div class="icon">🍸</div>No bars found.</div>`); loader('l-bars',false); return; }
+    html('r-bars', bars.map(b=>`<div class="card"><div class="bar-card">
+      <div class="bar-info">
+        <div class="bar-name">${b.name||'—'}</div>
+        <div class="bar-addr">${b.address||''}</div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          ${b.type?`<span class="badge badge-muted">${b.type}</span>`:''}
+          ${b.open_state?`<span class="badge badge-sage">${b.open_state}</span>`:''}
+        </div>
+        ${b.phone?`<div style="color:var(--muted);font-size:12px;margin-top:8px">📞 ${b.phone}</div>`:''}
+        ${b.website?`<div style="margin-top:6px"><a href="${b.website}" target="_blank" style="color:var(--terracotta);font-size:12px">Visit website →</a></div>`:''}
+      </div>
+      <div class="bar-stat">
+        ${b.rating?`<div class="rating">★ ${b.rating}</div>`:''}
+        ${b.reviews?`<div class="reviews">${b.reviews} reviews</div>`:''}
+        ${b.price?`<div style="color:var(--muted);font-size:12px;margin-top:4px">${b.price}</div>`:''}
+      </div>
+    </div></div>`).join(''));
+  } catch { html('r-bars', alertHtml('Could not reach the server.')); }
+  loader('l-bars', false);
+}
+
+/* ══════════════════════════════════════════════════════
+   GLASS / CREATOR SYSTEM
+══════════════════════════════════════════════════════ */
+function getColour(val) {
+  const key = (val||'').toLowerCase();
+  for (const [k,c] of Object.entries(COLOUR_MAP)) if (key.includes(k)) return c;
+  return FALLBACK_COLOURS[fallbackIdx++ % FALLBACK_COLOURS.length];
+}
+
+function selectPill(btn) {
+  const key = btn.dataset.key;
+  const val = btn.dataset.val;
+  const alreadySelected = btn.classList.contains('selected');
+  document.querySelectorAll(`.option-pill[data-key="${key}"]`).forEach(p => {
+    p.classList.remove('selected'); p.style.background=''; p.style.borderColor=''; p.style.color='';
+  });
+  if (alreadySelected) { creatorState[key]=null; removeGlassLayer(key); return; }
+  const colour = getColour(val);
+  btn.classList.add('selected');
+  btn.style.background  = colour;
+  btn.style.borderColor = colour;
+  btn.style.color       = contrastColor(colour);
+  creatorState[key] = val;
+  addGlassLayer(key, val, colour);
+}
+
+function addCreatorIngredient() {
+  const input = document.getElementById('c-ingredient');
+  const val   = input.value.trim();
+  if (!val) return;
+  creatorState.ingredient = val;
+  addGlassLayer('ingredient', val, getColour(val));
+  input.value = '';
+}
+
+// Keep old name for button onclick compatibility
+function addCustomIngredient(nameOverride) {
+  // If on custom page, add to custom ingredients list
+  const customPage = document.getElementById('page-custom');
+  if (customPage && customPage.classList.contains('active')) {
+    const input = document.getElementById('custom-add-ing');
+    const name  = nameOverride || input.value.trim();
+    if (!name) return;
+    if (!window._customIngredients) window._customIngredients = [];
+    if (!window._customIngredients.find(i=>i.name.toLowerCase()===name.toLowerCase())) {
+      window._customIngredients.push({name, amount:''});
+      renderCustomIngredientRows();
+    }
+    input.value = '';
+    ingAcClose('custom-ac-dd');
+  } else {
+    // On creator page
+    addCreatorIngredient();
+  }
+}
+
+function addGlassLayer(key, label, colour) {
+  const idx = glassLayers.findIndex(l=>l.key===key);
+  if (idx!==-1) glassLayers.splice(idx,1);
+  glassLayers.push({key,label,colour});
+  pourDrop(colour);
+  updateGlass();
+}
+function removeGlassLayer(key) {
+  const idx = glassLayers.findIndex(l=>l.key===key);
+  if (idx!==-1) glassLayers.splice(idx,1);
+  updateGlass();
+}
+function updateGlass() {
+  const liquidGroup = document.getElementById('liquid-group');
+  const chips       = document.getElementById('glass-chips');
+  const label       = document.getElementById('glass-label');
+  const shakeBtn    = document.getElementById('shake-btn');
+  liquidGroup.innerHTML = '';
+  if (!glassLayers.length) {
+    label.textContent = 'Select your preferences above';
+    chips.innerHTML   = '';
+    shakeBtn.style.display = 'none';
+    return;
+  }
+  shakeBtn.style.display = 'inline-block';
+  const layerH = Math.min(GLASS.maxH/glassLayers.length, 55);
+  const startY  = GLASS.botY - layerH*glassLayers.length;
+  function xAtY(y, side) {
+    const t = (y-GLASS.topY)/(GLASS.botY-GLASS.topY);
+    return side==='left' ? GLASS.topX1+(GLASS.botX1-GLASS.topX1)*t : GLASS.topX2+(GLASS.botX2-GLASS.topX2)*t;
+  }
+  glassLayers.forEach((layer,i) => {
+    const y1=startY+i*layerH, y2=y1+layerH;
+    const xl1=xAtY(y1,'left'),xr1=xAtY(y1,'right'),xl2=xAtY(y2,'left'),xr2=xAtY(y2,'right');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points',`${xl1},${y1} ${xr1},${y1} ${xr2},${y2} ${xl2},${y2}`);
+    poly.setAttribute('fill',layer.colour); poly.setAttribute('opacity','0.82');
+    poly.classList.add('liquid-layer'); poly.style.animationDelay=`${i*0.08}s`;
+    liquidGroup.appendChild(poly);
+    const hl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    hl.setAttribute('x1',xl1); hl.setAttribute('y1',y1); hl.setAttribute('x2',xr1); hl.setAttribute('y2',y1);
+    hl.setAttribute('stroke','rgba(255,255,255,0.4)'); hl.setAttribute('stroke-width','1');
+    liquidGroup.appendChild(hl);
+  });
+  chips.innerHTML = glassLayers.map(l=>`<span class="ing-chip" style="background:${l.colour};color:${contrastColor(l.colour)}">${l.label}</span>`).join('');
+  label.textContent = glassLayers.map(l=>l.label).join(' + ');
+}
+function pourDrop(colour) {
+  const dropGroup = document.getElementById('drop-group');
+  const cx  = 80+(Math.random()-0.5)*30;
+  const endY = GLASS.botY - Math.min(GLASS.maxH/glassLayers.length,55)*glassLayers.length - 10;
+  const drop = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+  drop.setAttribute('cx',cx); drop.setAttribute('cy',endY);
+  drop.setAttribute('rx','5'); drop.setAttribute('ry','8');
+  drop.setAttribute('fill',colour); drop.classList.add('drop');
+  dropGroup.appendChild(drop);
+  setTimeout(()=>drop.remove(), 700);
+}
+function shakeGlass() {
+  const svg = document.getElementById('cocktail-svg');
+  svg.classList.remove('is-shaking'); void svg.offsetWidth;
+  svg.classList.add('is-shaking');
+  svg.addEventListener('animationend',()=>svg.classList.remove('is-shaking'),{once:true});
+}
+function resetCreator() {
+  Object.keys(creatorState).forEach(k=>creatorState[k]=null);
+  glassLayers.length = 0; fallbackIdx = 0;
+  document.querySelectorAll('.option-pill').forEach(p=>{p.classList.remove('selected');p.style.background='';p.style.borderColor='';p.style.color='';});
+  const ci = document.getElementById('c-ingredient'); if(ci) ci.value='';
+  html('r-creator-results','');
+  updateGlass();
+}
+
+/* ══════════════════════════════════════════════════════
+   COCKTAIL CREATOR (API)
+══════════════════════════════════════════════════════ */
+async function createCocktail() {
+  loader('l-creator', true); html('r-creator-results','');
+  const body = {};
+  if (creatorState.flavour)     body.flavour     = creatorState.flavour;
+  if (creatorState.base_spirit) body.base_spirit  = creatorState.base_spirit;
+  if (creatorState.ingredient)  body.ingredient   = creatorState.ingredient;
+  if (creatorState.alcoholic)   body.alcoholic    = creatorState.alcoholic;
+  try {
+    const {ok,data} = await api('/create-cocktail','POST',body);
+    const matches = (!ok ? [] : data.matches||[]);
+    html('r-creator-results', matches.length ? matches.map(c=>renderCocktail(c)).join('') : renderNoMatchBox());
+  } catch { html('r-creator-results', alertHtml('Could not reach the server.')); }
+  loader('l-creator', false);
+}
+
+function renderNoMatchBox() {
+  const parts = [];
+  if (creatorState.base_spirit) parts.push(creatorState.base_spirit);
+  if (creatorState.ingredient)  parts.push(creatorState.ingredient);
+  if (creatorState.flavour)     parts.push(creatorState.flavour+' flavour');
+  const desc = parts.length ? parts.join(', ') : 'your selection';
+  return `<div class="card" style="text-align:center;padding:32px 24px;border-style:dashed">
+    <div style="font-size:32px;margin-bottom:12px">🧪</div>
+    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:8px">No matches in our database</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">
+      We couldn't find a cocktail with ${desc}. Want to invent one?
+    </p>
+    <button class="btn btn-primary" onclick="openCustomCocktailBuilder()" style="font-size:14px;padding:11px 28px">
+      ✨ Create my own cocktail
+    </button>
+  </div>`;
+}
+
+function openCustomCocktailBuilder() {
+  window._customIngredients = glassLayers.map(l=>({name:l.label,amount:''}));
+  if (creatorState.base_spirit && !window._customIngredients.find(i=>i.name===creatorState.base_spirit)) {
+    window._customIngredients.unshift({name:creatorState.base_spirit,amount:''});
+  }
+  navigate('custom');
+  renderCustomIngredientRows();
+  const cn=document.getElementById('custom-name'); if(cn) cn.value='';
+  const ci=document.getElementById('custom-instructions'); if(ci) ci.value='';
+  const cp=document.getElementById('custom-preview'); if(cp) cp.style.display='none';
+  html('r-custom','');
+}
+
+/* ══════════════════════════════════════════════════════
+   CUSTOM COCKTAIL BUILDER
+══════════════════════════════════════════════════════ */
+function renderCustomIngredientRows() {
+  const list = window._customIngredients||[];
+  const el   = document.getElementById('custom-ings-list');
+  if (!el) return;
+  if (!list.length) { el.innerHTML=`<p style="color:var(--muted);font-size:13px;padding:8px 0">No ingredients yet — add some below.</p>`; return; }
+  el.innerHTML = list.map((ing,i)=>`
+    <div class="ing-row">
+      <span class="ing-row-name">${ing.name}</span>
+      <input type="text" placeholder="e.g. 60ml / 2oz" value="${ing.amount||''}"
+        oninput="window._customIngredients[${i}].amount=this.value" style="font-size:13px"/>
+      <button class="ing-remove" onclick="customRemoveIngredient(${i})" title="Remove">×</button>
+    </div>`).join('');
+}
+function customRemoveIngredient(idx) {
+  window._customIngredients.splice(idx,1);
+  renderCustomIngredientRows();
+}
+
+function previewCustomCocktail() {
+  const name  = document.getElementById('custom-name').value.trim();
+  const glass = document.getElementById('custom-glass').value;
+  const cat   = document.getElementById('custom-category').value;
+  const instr = document.getElementById('custom-instructions').value.trim();
+  const ings  = (window._customIngredients||[]).filter(i=>i.name);
+  if (!name) { html('r-custom', alertHtml('Give your cocktail a name first.')); return; }
+  const ingHtml = ings.map(i=>`<strong>${i.amount?i.amount+' ':''}${i.name}</strong>`).join(', ')||'<em>None</em>';
+  const prev = document.getElementById('custom-preview');
+  prev.style.display='block';
+  prev.innerHTML=`
+    <div style="margin-bottom:8px">
+      <strong style="font-family:'Fraunces',serif;font-size:16px">${name}</strong>
+      ${glass?`<span style="margin-left:8px" class="badge badge-sage">${glass}</span>`:''}
+      ${cat?`<span style="margin-left:6px" class="badge badge-muted">${cat}</span>`:''}
+    </div>
+    <div style="margin-bottom:6px"><strong>Ingredients:</strong> ${ingHtml}</div>
+    ${instr?`<div><strong>Instructions:</strong> ${instr}</div>`:''}`;
+  html('r-custom','');
+}
+
+function saveCustomCocktail() {
+  const name  = document.getElementById('custom-name').value.trim();
+  const glass = document.getElementById('custom-glass').value;
+  const cat   = document.getElementById('custom-category').value;
+  const instr = document.getElementById('custom-instructions').value.trim();
+  const ings  = (window._customIngredients||[]).filter(i=>i.name);
+  if (!name)  { html('r-custom', alertHtml('Give your cocktail a name.')); return; }
+  if (!instr) { html('r-custom', alertHtml('Add instructions.')); return; }
+  if (!ings.length) { html('r-custom', alertHtml('Add at least one ingredient.')); return; }
+  const stored = JSON.parse(localStorage.getItem('sip_custom_cocktails')||'[]');
+  const cocktail = {
+    id: 'custom_'+Date.now(), name, glass:glass||'', category:cat||'Custom',
+    alcoholic: creatorState.alcoholic||'', instructions:instr,
+    ingredients: ings.map(i=>i.name), measurements: ings.map(i=>i.amount||''),
+    isCustom:true, createdAt: new Date().toISOString()
+  };
+  stored.push(cocktail);
+  localStorage.setItem('sip_custom_cocktails', JSON.stringify(stored));
+  savedCocktails[cocktail.id] = {id:cocktail.id,name,category:cocktail.category,alcoholic:cocktail.alcoholic,glass:cocktail.glass,isCustom:true};
+  localStorage.setItem('sip_saved', JSON.stringify(savedCocktails));
+  html('r-custom', alertHtml(`"${name}" saved to your Saved cocktails! ✓`, 'success'));
+  const cp=document.getElementById('custom-preview'); if(cp) cp.style.display='none';
+}
+
+/* ══════════════════════════════════════════════════════
+   TODAY + TRENDING
+══════════════════════════════════════════════════════ */
+async function getTodaysCocktail() {
+  loader('l-today', true); html('r-today','');
+  try {
+    const {ok,data} = await api('/cocktail-of-the-day');
+    if (!ok) { html('r-today', alertHtml(data.error)); loader('l-today',false); return; }
+    const cocktailId = data.id || data.idDrink;
+    if (cocktailId) {
+      html('r-today', `<div class="card" style="text-align:center;padding:32px 24px">
+        <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Today's cocktail</div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin-bottom:20px">${data.name}</div>
+        <button class="btn btn-primary view-cocktail-btn" data-id="${cocktailId}" style="font-size:14px;padding:12px 28px">
+          View full recipe →
+        </button>
+      </div>`);
+    } else {
+      html('r-today',`<div class="card"><div class="card-title">${data.name||'Unknown'}</div></div>`);
+    }
+  } catch { html('r-today', alertHtml('Could not reach the server.')); }
+  loader('l-today', false);
+}
+
+async function loadTrending() {
+  loader('l-trending', true); html('r-trending','');
+  try {
+    const {ok,data} = await api('/trending-cocktails');
+    if (!ok||!Array.isArray(data)) { html('r-trending', alertHtml('Could not load trending.')); loader('l-trending',false); return; }
+    if (!data.length) { html('r-trending',`<div class="empty"><div class="icon">📈</div>No data yet.</div>`); loader('l-trending',false); return; }
+    html('r-trending',`<div class="card" style="padding:8px 24px">`+
+      data.map((t,i)=>`<div class="trend-row" style="cursor:pointer" onclick="searchAndOpenByName('${t.cocktail_name.replace(/'/g,"\\'")}')">
+        <div class="trend-rank">${i+1}</div>
+        <div class="trend-name">${t.cocktail_name}</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="trend-count">${t.post_count} post${t.post_count!==1?'s':''}</div>
+          <span style="color:var(--terracotta);font-size:12px">View →</span>
+        </div>
+      </div>`).join('')+`</div>`);
+  } catch { html('r-trending', alertHtml('Could not reach the server.')); }
+  loader('l-trending', false);
+}
+
+/* ══════════════════════════════════════════════════════
+   ACCOUNT
+══════════════════════════════════════════════════════ */
+async function register() {
+  const username = document.getElementById('reg-user').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-pass').value;
+  if (!username||!email||!password) return html('r-register', alertHtml('All fields required.'));
+  try {
+    const {ok,data} = await api('/register','POST',{username,email,password});
+    if (ok) html('r-register', alertHtml(data.message+' — <a href="#" onclick="showLogin()" style="color:var(--success)">Log in now →</a>','success'));
+    else    html('r-register', alertHtml(data.error));
+  } catch { html('r-register', alertHtml('Could not reach the server.')); }
+}
+async function login() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  if (!username||!password) return html('r-login', alertHtml('Fill in all fields.'));
+  try {
+    const {ok,data} = await api('/login','POST',{username,password});
+    if (ok) {
+      setUser(username, data.user_id||data.id||data._id||null);
+      document.getElementById('login-user').value='';
+      document.getElementById('login-pass').value='';
+      html('r-login','');
+    } else html('r-login', alertHtml(data.error));
+  } catch { html('r-login', alertHtml('Could not reach the server.')); }
+}
+async function changePassword() {
+  if (!currentUser) return;
+  const password     = document.getElementById('cp-old').value;
+  const new_password = document.getElementById('cp-new').value;
+  if (!password||!new_password) return html('r-cp', alertHtml('All fields required.'));
+  try {
+    const {ok,data} = await api('/change-password','POST',{username:currentUser.username,password,new_password});
+    html('r-cp', ok ? alertHtml(data.message,'success') : alertHtml(data.error));
+  } catch { html('r-cp', alertHtml('Could not reach the server.')); }
+}
+async function deleteAccount() {
+  if (!currentUser) return;
+  const password = document.getElementById('del-pass').value;
+  if (!password) return html('r-del', alertHtml('Enter your password.'));
+  if (!confirm(`Permanently delete "${currentUser.username}"?`)) return;
+  try {
+    const {ok,data} = await api('/delete-user','POST',{username:currentUser.username,password});
+    html('r-del', ok ? alertHtml(data.message,'success') : alertHtml(data.error));
+    if (ok) clearUser();
+  } catch { html('r-del', alertHtml('Could not reach the server.')); }
+}
+</script>
+</body>
+</html>
