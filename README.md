@@ -1,118 +1,206 @@
-# Project Title
-// IMAGE OF THE REAL FRONTEND
-## Brief description of the project
-Sip&Match is a cocktail web application with multiple features, designed to help you search for cocktails and bars in your area, filtering by city, rating, custom search, and price range. You can also create a user account and upload pictres of your drinks, post them on your feed, see what other people are drinking and posting, and what they think about the cocktails they had. From the captions, you can find out if they enjoyed the taste of their drink, or if they would not reccommend sipping that cocktail. Another feature is the cocktail of the day, suggesting some new cocktails worth trying. The cocktail creator feature allows you to add ingredients you like and receive an interesting cocktail recipe that suits your flavour and taste profile. If you are searching for inspiration, you can also check out the trending cocktails tab.
-## Frontend mockup
-// TBA
-## Team members
-Nikola Andonov, Patrycja Beder, Hana Grigoriu, Rida el Harchaoui
+# Sip&Match
 
-## Installation details
-### 1. Clone the repository 
-    git clone <repository-url>
+A collaborative cocktail discovery web application built with **Flask, MongoDB, and external APIs**, combining cocktail search, personalised recommendations, bar discovery, and social features.
+
+> **Collaborative university project developed at Vrije Universiteit Amsterdam.**
+
+## Overview
+
+**Sip&Match** is a web application designed to help users discover cocktails based on their preferences and explore what other users are drinking.
+
+The application combines several features into one platform:
+
+- 🔎 **Cocktail Search** — Search cocktails by name or ingredient
+- 🍸 **Cocktail Creator** — Generate cocktail ideas based on selected ingredients and taste preferences
+- 📍 **Bar Finder** — Discover nearby bars using location-based search
+- ⭐ **Cocktail of the Day** — Receive a new cocktail recommendation
+- 🔥 **Trending Cocktails** — Explore popular cocktail choices
+- 👥 **Social Feed** — Create posts, share drinks, and interact with other users
+- 👤 **User Accounts** — Register and manage user accounts
+
+## Installation & Setup
+
+### 1. Clone the repository
+
+```
+git clone https://github.com/patrycjabeder-rgb/cocktail-api-app.git
+cd cocktail-api-app
+```
+
 ### 2. Create and activate a virtual environment
-Windows
 
-    python -m venv venv
-    venv\Scripts\activate
-Mac/Linux
-    
-    python3 -m venv venv
-    source venv/bin/activate
+**Windows**
+
+```
+python -m venv venv
+venv\Scripts\activate
+```
+
+**macOS / Linux**
+
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
 ### 3. Install dependencies
-    pip install -r requirements.txt
-### 4. Create a .env file
-Create a '.env' file in the project root and add:
-    
-    MONGO_URI=<your_mongodb_atlas_connection_string>
-    SERPAPI_API_KEY=<your_serpapi_key>
-### 5. Import cocktail data (first-time setup)
 
-Import cocktail data from the free CocktailDB API into your MongoDB collection.
+```
+pip install -r backend/requirements.txt
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```
+MONGO_URI=<your_mongodb_atlas_connection_string>
+SERPAPI_API_KEY=<your_serpapi_key>
+```
+
+### 5. Import cocktail data
+
+Populate the MongoDB cocktail collection using TheCocktailDB API:
+
 ```
 python backend/import_cocktails.py
 ```
+
 ### 6. Start the backend
+
 ```
 python backend/src/app.py
 ```
+
 The API will be available at:
 
 ```
 http://127.0.0.1:5000
 ```
-### 7. Start the frontend
-Open the frontend HTML file in a browser.
 
-## Architecture
-The application follows a client-server architecture.
+### 7. Open the frontend
 
+Open the frontend HTML file in a browser to interact with the application.
+
+The application follows a **client-server architecture**.
+
+```text
+┌─────────────────────┐
+│      Frontend       │
+│   HTML / CSS / JS   │
+└──────────┬──────────┘
+           │ HTTP requests
+           ▼
+┌─────────────────────┐
+│       Flask         │
+│     REST API        │
+└──────┬────────┬─────┘
+       │        │
+       ▼        ▼
+┌──────────┐  ┌─────────────────┐
+│ MongoDB  │  │  External APIs  │
+│  Atlas   │  │ CocktailDB      │
+│          │  │ SerpAPI         │
+└──────────┘  └─────────────────┘
+
+```
 ### Frontend
 
-The frontend is implemented using HTML, CSS, and JavaScript. It provides the user interface for:
+The frontend provides the user interface for:
 
 - User registration and login
-- Searching cocktails by name
-- Searching cocktails by ingredient(s)
-- Viewing cocktail details
-- Interacting with social features
+- Cocktail search
+- Ingredient-based search
+- Cocktail details
+- Social features
+- Cocktail discovery
 
 The frontend communicates with the backend through HTTP requests to REST API endpoints.
 
 ### Backend
 
-The backend is implemented using Flask and organized into routes and services.
+The backend is implemented using **Python and Flask**.
 
-Routes are responsible for:
-- Handling HTTP requests
-- Validating input
-- Returning JSON responses
+The application is organized into routes and services. Routes handle HTTP requests and responses, while services contain the underlying application logic.
 
-Services contain the application logic, such as:
+The backend includes functionality for:
+
+- Cocktail search
 - User account management
-- Cocktail search functionality
-- Feed functionality
-- Bar finder functionality
-- Cocktail of the day generation
+- Social feed functionality
+- Bar discovery
+- Cocktail recommendations
+- Database interaction
 
 ### Database
 
-MongoDB Atlas is used as the database.
+**MongoDB Atlas** is used as the application's database and is accessed through **PyMongo**.
 
-Collections include:
+The database contains collections for:
 
-- `users` – user account information
-- `cocktails` – cocktail data imported from TheCocktailDB
-- `posts` – user-generated posts
-- `follows` – user follow relationships
-
-MongoDB is accessed through PyMongo.
+- `users`
+- `cocktails`
+- `posts`
+- `follows`
 
 ### External APIs
 
-The application integrates with external services:
+The application integrates with external services including:
 
-- TheCocktailDB API (used to request cocktail data)
-- SerpAPI (used for bar finder functionality)
+- **TheCocktailDB API** — cocktail data and information
+- **SerpAPI** — bar discovery functionality
 
-### Data Flow
+## Testing
 
-1. User interacts with the frontend.
-2. The frontend sends an HTTP request to a Flask endpoint.
-3. The backend service processes the request.
-4. Data is retrieved from MongoDB or an external API.
-5. The backend returns a JSON response.
-6. The frontend displays the results to the user.
+The backend includes automated tests using **pytest** to test application functionality and user-account behaviour.
 
-### Files description 
-- **db.py** – Creates the MongoDB connection and provides access to database collections.
-- **search_cocktails.py** – Flask routes for cocktail search endpoints.
-- **search_cocktail_service.py** – Functions for searching cocktails by name, ingredient, multiple ingredients, and ID.
-- **user_accounts.py** – Flask routes for user account management.
-- **user_account_service.py** – Handles account creation, login, deletion, and password change.
-- **feed.py** – Routes related to the social feed.
-- **feed_service.py** – Functions for creating and retrieving posts.
-- **bar_finder.py** – Routes for finding nearby bars.
-- **bar_finder_service.py** – Integrates with SerpAPI to retrieve bar information.
-- **cocktail_of_the_day.py** – Route for generating a cocktail recommendation.
-- **cocktail_of_the_day_service.py** – Logic for selecting and returning a random cocktail of the day.
+## My Contribution
+
+This was a **collaborative project** developed as part of a university group assignment.
+
+I contributed to the development of the application across the backend and application functionality, working collaboratively with the other team members on the implementation and integration of the different components.
+
+## Technologies
+
+### Programming & Frameworks
+
+- Python
+- Flask
+- HTML
+- CSS
+- JavaScript
+
+### Database
+
+- MongoDB
+- PyMongo
+
+### APIs & Tools
+
+- TheCocktailDB API
+- SerpAPI
+- REST APIs
+- Git
+- GitHub
+- pytest
+
+## Project Structure
+
+```text
+cocktail-api-app/
+├── backend/
+│   ├── src/
+│   ├── tests/
+│   ├── app.py
+│   ├── import_cocktails.py
+│   └── requirements.txt
+├── frontend/
+│   └── templates/
+├── .gitignore
+└── README.md
+```
+## Academic Context
+
+This project was developed collaboratively as part of an **Artificial Intelligence university course at Vrije Universiteit Amsterdam**.
+
+The project combines web development, REST APIs, database management, external API integration, and automated testing into a single application.
